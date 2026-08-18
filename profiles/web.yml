@@ -1,8 +1,8 @@
 # ==============================================================================
-# Pi-DSH Web Profile: 官方 DSH「浏览器端 Cordis 微前端插槽矩阵」极简配置
+# Pi-DSH Web Profile: 官方 DSH「浏览器端 Cordis 微前端插槽矩阵」全量套件
 # ==============================================================================
 
-# ── 1. Web 宿主服务与 API 网关 ────────────────────────────────────────────────
+# ── 1. Web 宿主服务、存储与 API 传输网关 ───────────────────────────────────────
 - name: '@deepseek-ai/dsh-host-webserver'
   config:
     host: '127.0.0.1'
@@ -13,41 +13,58 @@
     distIndex: 'D:\gh-ws\dsh-ws\deepseek-harness\apps\web\dist\index.html'
 
 - name: '@deepseek-ai/dsh-host-apiproxy'
+- name: '@deepseek-ai/dsh-api-remotes'
+- name: '@deepseek-ai/dsh-workspace'
+- name: '@deepseek-ai/dsh-session-projection-cache'
+- name: '@deepseek-ai/dsh-session-stats'
+- name: '@deepseek-ai/dsh-message-feedback'
+- name: '@deepseek-ai/dsh-cordis-host-runner'
+- name: '@deepseek-ai/dsh-host-plugin-inventory'
 
-# ── 2. 浏览器端模块清单扫描器与 Web Shell 内核 ──────────────────────────────────
+# ── 2. 浏览器端模块清单扫描器与 Web Shell ───────────────────────────────────────
 - name: '@deepseek-ai/dsh-client-modules'
 - name: '@deepseek-ai/dsh-client-connection'
 - name: '@deepseek-ai/dsh-client-runtime'
+- name: '@deepseek-ai/dsh-cordis-client-runner'
 
-# ── 3. 官方 DSH 浏览器微前端插槽与 UI 插件矩阵 ──────────────────────────────────
-# 顶层布局与主题系统
-- name: '@deepseek-ai/dsh-client-ui-layout'
+# ── 3. 官方 DSH 浏览器微前端插槽与 UI 插件矩阵 (全套 26 个 UI 组件) ───────────────
+# 核心上下文与本地化
+- name: '@deepseek-ai/dsh-client-locale'
 - name: '@deepseek-ai/dsh-client-ui-theme'
-
-# 侧边栏与多会话历史
+- name: '@deepseek-ai/dsh-client-ui-layout'
 - name: '@deepseek-ai/dsh-client-ui-sidebar'
+- name: '@deepseek-ai/dsh-client-ui-workspace'
 
-# 流式会话卡片、Markdown 与 LaTeX
+# 会话流、轨迹与输入管道
 - name: '@deepseek-ai/dsh-client-ui-conversation'
-
-# 高阶工具渲染（Diff 变宽高亮、目录树、终端模拟）
-- name: '@deepseek-ai/dsh-client-ui-tool'
-
-# 生成物与代码工件展示
-- name: '@deepseek-ai/dsh-client-ui-deliverables'
-
-# 智能体预设选择器与命令面板
-- name: '@deepseek-ai/dsh-client-ui-agent-preset'
+- name: '@deepseek-ai/dsh-client-ui-trajectory'
+- name: '@deepseek-ai/dsh-client-ui-input-trigger'
 - name: '@deepseek-ai/dsh-client-ui-commands'
+- name: '@deepseek-ai/dsh-client-ui-model-selection'
 
-# 设置中心与大模型参数控制
+# 高阶工具渲染（Diff 对比、终端仿真、产物展示）
+- name: '@deepseek-ai/dsh-client-ui-tool'
+- name: '@deepseek-ai/dsh-client-ui-cordis'
+- name: '@deepseek-ai/dsh-client-ui-deliverables'
+- name: '@deepseek-ai/dsh-client-ui-workflow-run'
+
+# 智能体生态（预设、子智能体、技能、计划模式、目标）
+- name: '@deepseek-ai/dsh-client-ui-agent-preset'
+- name: '@deepseek-ai/dsh-client-ui-subagent'
+- name: '@deepseek-ai/dsh-client-ui-skill'
+- name: '@deepseek-ai/dsh-client-ui-plan'
+- name: '@deepseek-ai/dsh-client-ui-goal'
+- name: '@deepseek-ai/dsh-client-ui-jobs'
+- name: '@deepseek-ai/dsh-client-ui-user-questions'
+- name: '@deepseek-ai/dsh-client-ui-message-feedback'
+- name: '@deepseek-ai/dsh-client-ui-permission-presets'
+
+# 设置中心
 - name: '@deepseek-ai/dsh-client-ui-settings'
 - name: '@deepseek-ai/dsh-client-ui-settings-general'
 - name: '@deepseek-ai/dsh-client-ui-settings-models'
-
-# 任务计划与子智能体监控
-- name: '@deepseek-ai/dsh-client-ui-plan'
-- name: '@deepseek-ai/dsh-client-ui-subagent'
+- name: '@deepseek-ai/dsh-client-ui-settings-plugins'
+- name: '@deepseek-ai/dsh-client-ui-settings-plugin-inventory'
 
 # ── 4. 后端智能体基础设施与循环引擎 ──────────────────────────────────────────
 - name: '@deepseek-ai/dsh-agent'
