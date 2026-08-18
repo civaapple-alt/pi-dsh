@@ -6,3 +6,5 @@ dist
 pnpm-debug.log
 .pnpm-store/
 .cache/
+.sessions/
+.storage/
