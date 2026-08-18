@@ -157,6 +157,7 @@ async function main() {
 
   // 2. Initialize Cordis Root Context
   const ctx = new Context()
+  ctx.baseUrl = (await import('node:url')).pathToFileURL(path.resolve(process.cwd(), 'package.json')).href
 
   // 3. Apply Plugins declared in Profile
   for (const entry of pluginEntries) {
@@ -182,6 +183,61 @@ async function main() {
     } catch (err: any) {
       console.error(`\x1b[31m[Cordis Loader]\x1b[0m Failed to load plugin '${target}':`, err?.message || err)
     }
+  }
+
+  // Inject window.__DSH_BOOT__ into index.html and serve /plugins client bundles
+  if (ctx.webServer) {
+    const bootModules: Array<{ id: string; url: string; rev: string; immediately?: boolean }> = []
+    for (const entry of pluginEntries) {
+      const name = entry.name || entry.path
+      if (!name) continue
+      const pkgEntry = dshPackageMap.get(name)
+      if (pkgEntry) {
+        const clientJs = path.join(path.dirname(path.dirname(pkgEntry)), 'lib/client.js')
+        if (fs.existsSync(clientJs)) {
+          bootModules.push({
+            id: name,
+            url: `/plugins/${name}/client.js`,
+            rev: '1',
+            immediately: true
+          })
+        }
+      }
+    }
+
+    ctx.webServer.tapIndex((html) => {
+      if (html.includes('window.__DSH_BOOT__')) return html
+      const script = `<script>window.__DSH_BOOT__ = ${JSON.stringify({ modules: bootModules })}</script>`
+      const head = html.indexOf('<head>')
+      if (head !== -1) {
+        return `${html.slice(0, head + 6)}${script}${html.slice(head + 6)}`
+      }
+      return `${script}${html}`
+    })
+
+    ctx.webServer.register({
+      kind: 'prefix',
+      path: '/plugins',
+      handler: async (req, res) => {
+        const url = new URL(req.url || '', `http://${req.headers.host}`)
+        const match = url.pathname.match(/^\/plugins\/(.+?)\/client\.js$/)
+        if (match) {
+          const pkgName = match[1]
+          const pkgEntry = dshPackageMap.get(pkgName)
+          if (pkgEntry) {
+            const clientFile = path.join(path.dirname(path.dirname(pkgEntry)), 'lib/client.js')
+            if (fs.existsSync(clientFile)) {
+              const code = fs.readFileSync(clientFile, 'utf8')
+              res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8' })
+              res.end(code)
+              return
+            }
+          }
+        }
+        res.writeHead(404)
+        res.end('Plugin client bundle not found')
+      }
+    })
   }
 
   // 4. Handle Execution Mode
