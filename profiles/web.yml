@@ -61,14 +61,25 @@
 - name: '@deepseek-ai/dsh-client-runtime'
 - name: '@deepseek-ai/dsh-cordis-client-runner'
 
-# ── 5. 官方 DSH 浏览器微前端插槽与 UI 插件矩阵 (全套 UI 组件 + 目录浏览) ─────────
-# 核心上下文与本地化
+# ── 5. 官方 DSH 浏览器微前端插槽与 UI 插件矩阵 (按依赖拓扑严格排序) ─────────────
+# 基础服务与设置作用域底座（提供 settingsScope）
+- name: '@deepseek-ai/dsh-client-ui-settings'
+
+# 核心上下文、本地化与主题引擎（提供 locale, theme）
 - name: '@deepseek-ai/dsh-client-locale'
 - name: '@deepseek-ai/dsh-client-ui-theme'
+
+# 全局布局与外壳布局（提供 layout）
 - name: '@deepseek-ai/dsh-client-ui-layout'
 - name: '@deepseek-ai/dsh-client-ui-sidebar'
 - name: '@deepseek-ai/dsh-client-ui-workspace'
 - name: '@deepseek-ai/dsh-client-ui-directory-picker-browse'
+
+# 设置中心面板与分项
+- name: '@deepseek-ai/dsh-client-ui-settings-general'
+- name: '@deepseek-ai/dsh-client-ui-settings-models'
+- name: '@deepseek-ai/dsh-client-ui-settings-plugins'
+- name: '@deepseek-ai/dsh-client-ui-settings-plugin-inventory'
 
 # 会话流、轨迹与输入管道
 - name: '@deepseek-ai/dsh-client-ui-conversation'
@@ -93,13 +104,6 @@
 - name: '@deepseek-ai/dsh-client-ui-user-questions'
 - name: '@deepseek-ai/dsh-client-ui-message-feedback'
 - name: '@deepseek-ai/dsh-client-ui-permission-presets'
-
-# 设置中心
-- name: '@deepseek-ai/dsh-client-ui-settings'
-- name: '@deepseek-ai/dsh-client-ui-settings-general'
-- name: '@deepseek-ai/dsh-client-ui-settings-models'
-- name: '@deepseek-ai/dsh-client-ui-settings-plugins'
-- name: '@deepseek-ai/dsh-client-ui-settings-plugin-inventory'
 
 # ── 6. 后端智能体基础设施与循环引擎 ──────────────────────────────────────────
 - name: '@deepseek-ai/dsh-agent'
