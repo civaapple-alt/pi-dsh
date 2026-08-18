@@ -13,6 +13,10 @@
     model: 'deepseek-v4-flash'
 - name: '@deepseek-ai/dsh-settings-file'
 - name: '@deepseek-ai/dsh-credentials-local'
+- name: '@deepseek-ai/dsh-fs-local'
+- name: '@deepseek-ai/dsh-subprocess-local'
+- name: '@deepseek-ai/dsh-shell-env'
+- name: '@deepseek-ai/dsh-shell'
 - name: '@deepseek-ai/dsh-llm'
 - name: '@deepseek-ai/dsh-llm-deepseek'
 - name: '@deepseek-ai/dsh-tools'
@@ -110,7 +114,10 @@
 
 - name: '@deepseek-ai/dsh-agent-presets'
   config:
-    default: coder
+    default: standard
+    roots:
+      - path: 'D:\gh-ws\dsh-ws\pi-dsh\presets'
+        trust: system
 
 - name: '@deepseek-ai/dsh-agent-loop'
   config:

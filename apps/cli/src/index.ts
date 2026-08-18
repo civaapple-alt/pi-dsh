@@ -161,20 +161,20 @@ async function main() {
   const baseUrlPkg = fs.existsSync(webAppPkg) ? webAppPkg : path.resolve(process.cwd(), 'package.json')
   ctx.baseUrl = (await import('node:url')).pathToFileURL(baseUrlPkg).href
 
-  const loaderEntries: Array<{
-    id: string
-    options: { name: string; group?: boolean }
-    disabled: boolean
-    fiber?: { state: number }
-  }> = []
+  const vendorLoaderPath = path.resolve(process.cwd(), '../deepseek-harness/vendor/loader/lib/index.js')
+  const { Loader } = await import((await import('node:url')).pathToFileURL(vendorLoaderPath).href)
+  const loader = new Loader(ctx, { baseUrl: ctx.baseUrl })
 
-  ctx.provide('loader', {
-    entries: () => loaderEntries,
-    builtins: Object.create(null),
-    internal: {
-      resolve: (name: string) => dshPackageMap.get(name) || name,
-    },
-  } as any)
+  const origInternalImport = loader.internal.import.bind(loader.internal)
+  loader.internal.import = async (specifier: string, parentURL: string, importAttributes: any) => {
+    if (dshPackageMap.has(specifier)) {
+      const target = dshPackageMap.get(specifier)!
+      return await import((await import('node:url')).pathToFileURL(target).href)
+    }
+    return origInternalImport(specifier, parentURL, importAttributes)
+  }
+
+  const loadedEntriesList: any[] = []
 
   // 3. Apply Plugins declared in Profile
   for (const entry of pluginEntries) {
@@ -195,12 +195,12 @@ async function main() {
         mod = await import(target)
       }
       const plugin = mod.default || mod
-      await ctx.plugin(plugin, entry.config)
-      loaderEntries.push({
+      const fiber = await ctx.plugin(plugin, entry.config)
+      loadedEntriesList.push({
         id: target,
         options: { name: target },
         disabled: Boolean(entry.disabled),
-        fiber: { state: 2 }, // Active
+        fiber: fiber || { state: 2 },
       })
       console.log(`\x1b[34m[Cordis Loader]\x1b[0m Loaded plugin: ${target}`)
     } catch (err: any) {
@@ -229,7 +229,7 @@ async function main() {
         }
       }
     }
-    for (const entry of loaderEntries) {
+    for (const entry of loadedEntriesList) {
       cm.dirty?.add(entry.options.name)
     }
     cm.flush?.((err: any) => console.error('[client-modules flush error]', err))
