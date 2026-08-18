@@ -10,15 +10,6 @@
   "dependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
     "@deepseek-ai/cosmokit": "^1.8.2",
-    "@pi-dsh/agent": "workspace:*",
-    "@pi-dsh/agent-loop": "workspace:*",
-    "@pi-dsh/agent-presets": "workspace:*",
-    "@pi-dsh/host-webserver": "workspace:*",
-    "@pi-dsh/system-prompt": "workspace:*",
-    "@pi-dsh/tools": "workspace:*",
-    "@pi-dsh/tool-bash": "workspace:*",
-    "@pi-dsh/tool-fs": "workspace:*",
-    "@pi-dsh/tool-search": "workspace:*",
     "dotenv": "^16.4.7",
     "js-yaml": "^4.3.1"
   }
