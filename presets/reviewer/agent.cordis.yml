@@ -1,0 +1,13 @@
+# ==========================================================
+# Reviewer Agent Scoped Capability Composition (Read-Only)
+# ==========================================================
+
+- name: '@pi-dsh/system-prompt'
+
+- name: '@pi-dsh/tools'
+
+- name: '@pi-dsh/tool-fs'
+  config: {}
+
+- name: '@pi-dsh/tool-search'
+  config: {}

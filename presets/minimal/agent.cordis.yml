@@ -1,0 +1,11 @@
+# ==========================================================
+# Minimal Agent Scoped Capability Composition (Bash-Only)
+# ==========================================================
+
+- name: '@pi-dsh/system-prompt'
+
+- name: '@pi-dsh/tools'
+
+- name: '@pi-dsh/tool-bash'
+  config:
+    timeoutMs: 30000

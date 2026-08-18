@@ -1,0 +1,17 @@
+# ==========================================================
+# Pi-DSH Profile: web (Full-Stack Agent Web GUI)
+# ==========================================================
+
+- name: '@pi-dsh/host-webserver'
+  config:
+    port: 3000
+
+- name: '@pi-dsh/agent'
+
+- name: '@pi-dsh/agent-presets'
+  config:
+    default: coder
+
+- name: '@pi-dsh/agent-loop'
+  config:
+    defaultModel: deepseek-chat

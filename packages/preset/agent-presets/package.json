@@ -1,0 +1,23 @@
+{
+  "name": "@pi-dsh/agent-presets",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@pi-dsh/system-prompt": "workspace:*",
+    "@pi-dsh/tools": "workspace:*",
+    "@pi-dsh/tool-bash": "workspace:*",
+    "@pi-dsh/tool-fs": "workspace:*",
+    "@pi-dsh/tool-search": "workspace:*",
+    "js-yaml": "^4.3.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.20.1"
+  }
+}

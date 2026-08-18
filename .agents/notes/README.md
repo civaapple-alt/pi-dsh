@@ -1,0 +1,13 @@
+# Pi-DSH Architecture & Design Decisions (Agent Notes)
+
+English | [中文](README.zh.md)
+
+This directory tracks the architectural records, design decisions, and tradeoffs for Pi-DSH.
+
+---
+
+## Index
+
+| Date | Title | Core Theme |
+|---|---|---|
+| `2026-08-18` | [Pi-DSH Architecture & Profile/Preset Model](implemented/architecture/2026-08-18-pi-dsh-agent-and-presets-architecture.md) | Cordis microkernel, Two-tier Profile/Preset model, Turn execution engine, and Web/Headless dual-mode |

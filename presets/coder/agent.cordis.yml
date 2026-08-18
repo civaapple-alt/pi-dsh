@@ -1,0 +1,17 @@
+# ==========================================================
+# Coder Agent Scoped Capability Composition
+# ==========================================================
+
+- name: '@pi-dsh/system-prompt'
+
+- name: '@pi-dsh/tools'
+
+- name: '@pi-dsh/tool-fs'
+  config: {}
+
+- name: '@pi-dsh/tool-bash'
+  config:
+    timeoutMs: 60000
+
+- name: '@pi-dsh/tool-search'
+  config: {}

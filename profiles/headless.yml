@@ -1,0 +1,13 @@
+# ==========================================================
+# Pi-DSH Profile: headless (Automated CLI & Single Tasks)
+# ==========================================================
+
+- name: '@pi-dsh/agent'
+
+- name: '@pi-dsh/agent-presets'
+  config:
+    default: coder
+
+- name: '@pi-dsh/agent-loop'
+  config:
+    defaultModel: deepseek-chat
