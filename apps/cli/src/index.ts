@@ -155,9 +155,24 @@ async function main() {
   const profileContent = fs.readFileSync(profileFile, 'utf8')
   const pluginEntries = yaml.load(profileContent) as PluginConfigEntry[]
 
-  // 2. Initialize Cordis Root Context
+  // 2. Initialize Cordis Root Context and Loader Service
   const ctx = new Context()
   ctx.baseUrl = (await import('node:url')).pathToFileURL(path.resolve(process.cwd(), 'package.json')).href
+
+  const loaderEntries: Array<{
+    id: string
+    options: { name: string; group?: boolean }
+    disabled: boolean
+    fiber?: { state: number }
+  }> = []
+
+  ctx.provide('loader', {
+    entries: () => loaderEntries,
+    builtins: Object.create(null),
+    internal: {
+      resolve: (name: string) => dshPackageMap.get(name) || name,
+    },
+  } as any)
 
   // 3. Apply Plugins declared in Profile
   for (const entry of pluginEntries) {
@@ -179,6 +194,12 @@ async function main() {
       }
       const plugin = mod.default || mod
       await ctx.plugin(plugin, entry.config)
+      loaderEntries.push({
+        id: target,
+        options: { name: target },
+        disabled: Boolean(entry.disabled),
+        fiber: { state: 2 }, // Active
+      })
       console.log(`\x1b[34m[Cordis Loader]\x1b[0m Loaded plugin: ${target}`)
     } catch (err: any) {
       console.error(`\x1b[31m[Cordis Loader]\x1b[0m Failed to load plugin '${target}':`, err?.message || err)
@@ -232,29 +253,31 @@ async function main() {
       return `${script}${html}`
     })
 
-    ctx.webServer.register({
-      kind: 'prefix',
-      path: '/plugins',
-      handler: async (req, res) => {
-        const url = new URL(req.url || '', `http://${req.headers.host}`)
-        const match = url.pathname.match(/^\/plugins\/(.+?)\/client\.js$/)
-        if (match) {
-          const pkgName = match[1]
-          const pkgEntry = dshPackageMap.get(pkgName)
-          if (pkgEntry) {
-            const clientFile = path.join(path.dirname(path.dirname(pkgEntry)), 'lib/client.js')
-            if (fs.existsSync(clientFile)) {
-              const code = fs.readFileSync(clientFile, 'utf8')
-              res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8' })
-              res.end(code)
-              return
+    try {
+      ctx.webServer.register({
+        kind: 'prefix',
+        path: '/plugins',
+        handler: async (req, res) => {
+          const url = new URL(req.url || '', `http://${req.headers.host}`)
+          const match = url.pathname.match(/^\/plugins\/(.+?)\/client\.js$/)
+          if (match) {
+            const pkgName = match[1]
+            const pkgEntry = dshPackageMap.get(pkgName)
+            if (pkgEntry) {
+              const clientFile = path.join(path.dirname(path.dirname(pkgEntry)), 'lib/client.js')
+              if (fs.existsSync(clientFile)) {
+                const code = fs.readFileSync(clientFile, 'utf8')
+                res.writeHead(200, { 'Content-Type': 'text/javascript; charset=utf-8' })
+                res.end(code)
+                return
+              }
             }
           }
+          res.writeHead(404)
+          res.end('Not Found')
         }
-        res.writeHead(404)
-        res.end('Plugin client bundle not found')
-      }
-    })
+      })
+    } catch {}
   }
 
   // 4. Handle Execution Mode
