@@ -1,11 +1,51 @@
-# ==========================================================
-# Pi-DSH Profile: web (Full-Stack Agent Web GUI)
-# ==========================================================
+# ==============================================================================
+# Pi-DSH Web Profile: 官方 DSH「浏览器端 Cordis 微前端插槽矩阵」极简配置
+# ==============================================================================
 
+# ── 1. Web 宿主服务与 API 网关 ────────────────────────────────────────────────
 - name: '@deepseek-ai/dsh-host-webserver'
   config:
+    host: '127.0.0.1'
     port: 3000
 
+- name: '@deepseek-ai/dsh-host-apiproxy'
+
+# ── 2. 浏览器端模块清单扫描器与 Web Shell 内核 ──────────────────────────────────
+- name: '@deepseek-ai/dsh-client-modules'
+- name: '@deepseek-ai/dsh-client-connection'
+- name: '@deepseek-ai/dsh-client-runtime'
+
+# ── 3. 官方 DSH 浏览器微前端插槽与 UI 插件矩阵 ──────────────────────────────────
+# 顶层布局与主题系统
+- name: '@deepseek-ai/dsh-client-ui-layout'
+- name: '@deepseek-ai/dsh-client-ui-theme'
+
+# 侧边栏与多会话历史
+- name: '@deepseek-ai/dsh-client-ui-sidebar'
+
+# 流式会话卡片、Markdown 与 LaTeX
+- name: '@deepseek-ai/dsh-client-ui-conversation'
+
+# 高阶工具渲染（Diff 变宽高亮、目录树、终端模拟）
+- name: '@deepseek-ai/dsh-client-ui-tool'
+
+# 生成物与代码工件展示
+- name: '@deepseek-ai/dsh-client-ui-deliverables'
+
+# 智能体预设选择器与命令面板
+- name: '@deepseek-ai/dsh-client-ui-agent-preset'
+- name: '@deepseek-ai/dsh-client-ui-commands'
+
+# 设置中心与大模型参数控制
+- name: '@deepseek-ai/dsh-client-ui-settings'
+- name: '@deepseek-ai/dsh-client-ui-settings-general'
+- name: '@deepseek-ai/dsh-client-ui-settings-models'
+
+# 任务计划与子智能体监控
+- name: '@deepseek-ai/dsh-client-ui-plan'
+- name: '@deepseek-ai/dsh-client-ui-subagent'
+
+# ── 4. 后端智能体基础设施与循环引擎 ──────────────────────────────────────────
 - name: '@deepseek-ai/dsh-agent'
 
 - name: '@deepseek-ai/dsh-agent-presets'
@@ -23,3 +63,5 @@
 - name: '@deepseek-ai/dsh-compaction-basic'
   config:
     maxTokens: 32000
+
+- name: '@deepseek-ai/dsh-token-meter'
