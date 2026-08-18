@@ -187,18 +187,30 @@ async function main() {
 
   // Inject window.__DSH_BOOT__ into index.html and serve /plugins client bundles
   if (ctx.webServer) {
-    const bootModules: Array<{ id: string; url: string; rev: string; immediately?: boolean }> = []
+    const bootEntries: Array<{ id: string; url: string; rev: string; inject?: string[]; immediately?: boolean }> = []
     for (const entry of pluginEntries) {
       const name = entry.name || entry.path
       if (!name) continue
       const pkgEntry = dshPackageMap.get(name)
       if (pkgEntry) {
-        const clientJs = path.join(path.dirname(path.dirname(pkgEntry)), 'lib/client.js')
+        const pkgDir = path.dirname(path.dirname(pkgEntry))
+        const clientJs = path.join(pkgDir, 'lib/client.js')
+        const pkgJsonFile = path.join(pkgDir, 'package.json')
         if (fs.existsSync(clientJs)) {
-          bootModules.push({
+          let inject: string[] | undefined
+          if (fs.existsSync(pkgJsonFile)) {
+            try {
+              const parsed = JSON.parse(fs.readFileSync(pkgJsonFile, 'utf8'))
+              if (Array.isArray(parsed?.dsh?.client?.inject)) {
+                inject = parsed.dsh.client.inject
+              }
+            } catch {}
+          }
+          bootEntries.push({
             id: name,
-            url: `/plugins/${name}/client.js`,
+            url: `/plugins/${name}/client.js?rev=1`,
             rev: '1',
+            inject,
             immediately: true
           })
         }
@@ -207,7 +219,7 @@ async function main() {
 
     ctx.webServer.tapIndex((html) => {
       if (html.includes('window.__DSH_BOOT__')) return html
-      const script = `<script>window.__DSH_BOOT__ = ${JSON.stringify({ modules: bootModules })}</script>`
+      const script = `<script>window.__DSH_BOOT__ = ${JSON.stringify({ rev: '1', entries: bootEntries })}</script>`
       const head = html.indexOf('<head>')
       if (head !== -1) {
         return `${html.slice(0, head + 6)}${script}${html.slice(head + 6)}`
