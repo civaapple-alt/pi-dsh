@@ -8,6 +8,10 @@
     host: '127.0.0.1'
     port: 3000
 
+- name: '@deepseek-ai/dsh-host-frontend-static'
+  config:
+    distIndex: 'D:\gh-ws\dsh-ws\deepseek-harness\apps\web\dist\index.html'
+
 - name: '@deepseek-ai/dsh-host-apiproxy'
 
 # ── 2. 浏览器端模块清单扫描器与 Web Shell 内核 ──────────────────────────────────
