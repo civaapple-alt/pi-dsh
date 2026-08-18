@@ -2,10 +2,9 @@
 # Minimal Agent Scoped Capability Composition (Bash-Only)
 # ==========================================================
 
-- name: '@pi-dsh/system-prompt'
-
-- name: '@pi-dsh/tools'
-
-- name: '@pi-dsh/tool-bash'
+- name: '@deepseek-ai/dsh-system-prompt'
+- name: '@deepseek-ai/dsh-tools'
+- name: '@deepseek-ai/dsh-bash-local'
   config:
     timeoutMs: 30000
+- name: '@deepseek-ai/dsh-tool-bash'

@@ -1,6 +1,7 @@
 import { Context, Service } from '@deepseek-ai/cordis'
 import fs from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import yaml from 'js-yaml'
 import type { AgentPreset, PresetMetadata } from './types.js'
 
@@ -13,12 +14,47 @@ const dshPackageMap = new Map<string, string>()
 
 function buildDshPackageMap() {
   if (dshPackageMap.size > 0) return
-  const roots = [
+
+  // 1. Scan local pi-dsh workspace packages first
+  const localRoots = [
+    path.resolve(process.cwd(), 'packages'),
+    path.resolve(process.cwd(), 'packages/core'),
+    path.resolve(process.cwd(), 'packages/preset'),
+    path.resolve(process.cwd(), 'packages/host'),
+    path.resolve(process.cwd(), 'packages/tools')
+  ]
+
+  for (const root of localRoots) {
+    if (!fs.existsSync(root)) continue
+    for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue
+      const pkgPath = path.join(root, entry.name, 'package.json')
+      if (fs.existsSync(pkgPath)) {
+        try {
+          const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'))
+          if (pkg.name) {
+            const modEntry = fs.existsSync(path.join(root, entry.name, 'lib/index.js'))
+              ? path.join(root, entry.name, 'lib/index.js')
+              : path.join(root, entry.name, 'src/index.ts')
+            dshPackageMap.set(pkg.name, modEntry)
+
+            const alias = pkg.name.replace('@pi-dsh/', '@deepseek-ai/dsh-')
+            if (!dshPackageMap.has(alias)) {
+              dshPackageMap.set(alias, modEntry)
+            }
+          }
+        } catch {}
+      }
+    }
+  }
+
+  // 2. Scan deepseek-harness packages & vendor
+  const dshRoots = [
     path.resolve(process.cwd(), '../deepseek-harness/packages'),
     path.resolve(process.cwd(), '../deepseek-harness/vendor')
   ]
 
-  for (const root of roots) {
+  for (const root of dshRoots) {
     if (!fs.existsSync(root)) continue
     for (const group of fs.readdirSync(root, { withFileTypes: true })) {
       if (!group.isDirectory()) continue
@@ -26,7 +62,7 @@ function buildDshPackageMap() {
       if (fs.existsSync(path.join(groupPath, 'package.json'))) {
         try {
           const pkg = JSON.parse(fs.readFileSync(path.join(groupPath, 'package.json'), 'utf8'))
-          if (pkg.name) {
+          if (pkg.name && !dshPackageMap.has(pkg.name)) {
             const entry = fs.existsSync(path.join(groupPath, 'lib/index.js'))
               ? path.join(groupPath, 'lib/index.js')
               : path.join(groupPath, 'src/index.ts')
@@ -41,7 +77,7 @@ function buildDshPackageMap() {
           if (fs.existsSync(pkgFile)) {
             try {
               const pkg = JSON.parse(fs.readFileSync(pkgFile, 'utf8'))
-              if (pkg.name) {
+              if (pkg.name && !dshPackageMap.has(pkg.name)) {
                 const entry = fs.existsSync(path.join(subPath, 'lib/index.js'))
                   ? path.join(subPath, 'lib/index.js')
                   : path.join(subPath, 'src/index.ts')
@@ -126,10 +162,11 @@ export class AgentPresetsService extends Service {
         let mod: any
         try {
           if (dshPackageMap.has(pluginTarget)) {
-            mod = await import(dshPackageMap.get(pluginTarget)!)
+            const fileUrl = pathToFileURL(dshPackageMap.get(pluginTarget)!).href
+            mod = await import(fileUrl)
           } else if (pluginTarget.startsWith('.') || path.isAbsolute(pluginTarget)) {
             const resolvedPath = path.resolve(preset.path, pluginTarget)
-            mod = await import(resolvedPath)
+            mod = await import(pathToFileURL(resolvedPath).href)
           } else {
             mod = await import(pluginTarget)
           }

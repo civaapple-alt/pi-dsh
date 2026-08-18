@@ -2,12 +2,22 @@
 # Pi-DSH Profile: headless (Automated CLI & Single Tasks)
 # ==========================================================
 
-- name: '@pi-dsh/agent'
+- name: '@deepseek-ai/dsh-agent'
 
-- name: '@pi-dsh/agent-presets'
+- name: '@deepseek-ai/dsh-agent-presets'
   config:
     default: coder
 
-- name: '@pi-dsh/agent-loop'
+- name: '@deepseek-ai/dsh-agent-loop'
   config:
     defaultModel: deepseek-chat
+
+- name: '@deepseek-ai/dsh-session-persistence-jsonl'
+  config:
+    dir: '.sessions'
+
+- name: '@deepseek-ai/dsh-compaction-basic'
+  config:
+    maxTokens: 32000
+
+- name: '@deepseek-ai/dsh-token-meter'
