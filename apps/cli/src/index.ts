@@ -157,7 +157,9 @@ async function main() {
 
   // 2. Initialize Cordis Root Context and Loader Service
   const ctx = new Context()
-  ctx.baseUrl = (await import('node:url')).pathToFileURL(path.resolve(process.cwd(), 'package.json')).href
+  const webAppPkg = path.resolve(process.cwd(), '../deepseek-harness/packages/bundle/web-app/package.json')
+  const baseUrlPkg = fs.existsSync(webAppPkg) ? webAppPkg : path.resolve(process.cwd(), 'package.json')
+  ctx.baseUrl = (await import('node:url')).pathToFileURL(baseUrlPkg).href
 
   const loaderEntries: Array<{
     id: string
@@ -206,8 +208,16 @@ async function main() {
     }
   }
 
-  // Allow Cordis event loop to activate injected services
+  // Allow Cordis event loop to activate injected services and flush client-modules
   await new Promise(r => setTimeout(r, 50))
+
+  if ((ctx as any).clientModules) {
+    const cm = (ctx as any).clientModules
+    for (const entry of loaderEntries) {
+      cm.dirty?.add(entry.options.name)
+    }
+    cm.flush?.((err: any) => console.error('[client-modules flush error]', err))
+  }
 
   // Inject window.__DSH_BOOT__ into index.html and serve /plugins client bundles
   if (ctx.webServer) {
