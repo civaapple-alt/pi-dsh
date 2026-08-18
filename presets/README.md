@@ -12,6 +12,6 @@
 
 | 预设名称 | 目录路径 | 挂载插件列表 | 适用场景 |
 |---|---|---|---|
-| **Coder** | [`presets/coder/`](coder/) | `system-prompt`, `tools`, `tool-fs`, `tool-bash`, `tool-search` | 完整能力 AI 编码开发助手（支持读写文件、运行命令、搜索代码）。 |
-| **Reviewer** | [`presets/reviewer/`](reviewer/) | `system-prompt`, `tools`, `tool-fs` (只读), `tool-search` | 代码审查与诊断（禁用命令执行与写入，只读安全）。 |
-| **Minimal** | [`presets/minimal/`](minimal/) | `system-prompt`, `tools`, `tool-bash` | 极简终端执行 Agent。 |
+| **Coder** | [`presets/coder/`](coder/) | `@deepseek-ai/dsh-system-prompt`, `@deepseek-ai/dsh-tools`, `@deepseek-ai/dsh-tool-fs`, `@deepseek-ai/dsh-tool-bash`, `@deepseek-ai/dsh-tool-fs-search` | 完整能力 AI 编码开发助手（支持读写文件、运行命令、搜索代码）。 |
+| **Reviewer** | [`presets/reviewer/`](reviewer/) | `@deepseek-ai/dsh-system-prompt`, `@deepseek-ai/dsh-tools`, `@deepseek-ai/dsh-tool-fs` (只读), `@deepseek-ai/dsh-tool-fs-search` | 代码审查与诊断（禁用命令执行与写入，只读安全）。 |
+| **Minimal** | [`presets/minimal/`](minimal/) | `@deepseek-ai/dsh-system-prompt`, `@deepseek-ai/dsh-tools`, `@deepseek-ai/dsh-tool-bash` | 极简终端执行 Agent。 |
