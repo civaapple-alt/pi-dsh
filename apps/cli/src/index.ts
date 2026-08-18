@@ -190,6 +190,7 @@ async function main() {
 
   // Inject window.__DSH_BOOT__ into index.html and serve /plugins client bundles
   if (ctx.webServer) {
+    const bootRev = Date.now().toString(36)
     const bootEntries: Array<{ id: string; url: string; rev: string; inject?: string[]; immediately?: boolean }> = []
     for (const entry of pluginEntries) {
       const name = entry.name || entry.path
@@ -200,6 +201,7 @@ async function main() {
         const clientJs = path.join(pkgDir, 'lib/client.js')
         const pkgJsonFile = path.join(pkgDir, 'package.json')
         if (fs.existsSync(clientJs)) {
+          const rev = Math.floor(fs.statSync(clientJs).mtimeMs).toString(36)
           let inject: string[] | undefined
           if (fs.existsSync(pkgJsonFile)) {
             try {
@@ -211,8 +213,8 @@ async function main() {
           }
           bootEntries.push({
             id: name,
-            url: `/plugins/${name}/client.js?rev=1`,
-            rev: '1',
+            url: `/plugins/${name}/client.js?rev=${rev}`,
+            rev,
             inject,
             immediately: true
           })
@@ -222,7 +224,7 @@ async function main() {
 
     ctx.webServer.tapIndex((html) => {
       if (html.includes('window.__DSH_BOOT__')) return html
-      const script = `<script>window.__DSH_BOOT__ = ${JSON.stringify({ rev: '1', entries: bootEntries })}</script>`
+      const script = `<script>window.__DSH_BOOT__ = ${JSON.stringify({ rev: bootRev, entries: bootEntries })}</script>`
       const head = html.indexOf('<head>')
       if (head !== -1) {
         return `${html.slice(0, head + 6)}${script}${html.slice(head + 6)}`
