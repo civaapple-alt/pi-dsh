@@ -213,26 +213,33 @@ async function main() {
 
   if ((ctx as any).clientModules) {
     const cm = (ctx as any).clientModules
-    const origResolve = cm.resolvePkgJson?.bind(cm)
-    if (origResolve) {
-      cm.resolvePkgJson = (spec: string) => {
+    cm.pkgMeta?.clear()
+    for (const [name, modPath] of dshPackageMap.entries()) {
+      const pkgDir = path.dirname(path.dirname(modPath))
+      const clientJs = path.join(pkgDir, 'lib/client.js')
+      const pkgJsonFile = path.join(pkgDir, 'package.json')
+      if (fs.existsSync(clientJs) && fs.existsSync(pkgJsonFile)) {
         try {
-          return origResolve(spec)
-        } catch (e) {
-          if (dshPackageMap.has(spec)) {
-            const modPath = dshPackageMap.get(spec)!
-            const pkgDir = path.dirname(path.dirname(modPath))
-            const pkgJson = path.join(pkgDir, 'package.json')
-            if (fs.existsSync(pkgJson)) return pkgJson
+          const parsed = JSON.parse(fs.readFileSync(pkgJsonFile, 'utf8'))
+          if (parsed?.dsh?.client?.platform === 'web') {
+            const rev = Math.floor(fs.statSync(clientJs).mtimeMs).toString(36)
+            cm.table?.set(name, {
+              entry: {
+                id: name,
+                url: `/plugins/${name}/client.js?rev=${rev}`,
+                rev,
+                ...(parsed.dsh.client.inject ? { inject: parsed.dsh.client.inject } : {}),
+                immediately: true,
+              },
+              clientPath: clientJs,
+            })
           }
-          throw e
-        }
+        } catch {}
       }
     }
-    for (const entry of loadedEntriesList) {
-      cm.dirty?.add(entry.options.name)
+    if (cm.table && cm.compose) {
+      cm.composed = cm.compose()
     }
-    cm.flush?.((err: any) => console.error('[client-modules flush error]', err))
   }
 
   // Inject window.__DSH_BOOT__ into index.html and serve /plugins client bundles
