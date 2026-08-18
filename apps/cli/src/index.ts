@@ -185,6 +185,13 @@ async function main() {
     }
   }
 
+  const apiProxyInject = ['agentDefaultModel', 'agents', 'attachments', 'directoryPicker', 'llm', 'sessions', 'subagents', 'sessionQuery', 'tools', 'userQuestions', 'workspaceRegistry']
+  console.log('\x1b[35m--- ApiProxy Services Status ---\x1b[0m')
+  for (const s of apiProxyInject) {
+    console.log(`  Service [${s}]:`, (ctx as any)[s] ? '\x1b[32mOK\x1b[0m' : '\x1b[31mMISSING\x1b[0m')
+  }
+  console.log(`  ctx.apiProxy:`, (ctx as any).apiProxy ? '\x1b[32mOK\x1b[0m' : '\x1b[31mMISSING\x1b[0m')
+
   // Inject window.__DSH_BOOT__ into index.html and serve /plugins client bundles
   if (ctx.webServer) {
     const bootEntries: Array<{ id: string; url: string; rev: string; inject?: string[]; immediately?: boolean }> = []

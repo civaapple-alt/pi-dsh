@@ -4,6 +4,7 @@
 
 # ── 1. 核心运行时、计时器与 Typert 类型 RPC 网关 ────────────────────────────────
 - name: '@deepseek-ai/cordis-plugin-timer'
+- name: '@deepseek-ai/dsh-system-prompt'
 - name: '@deepseek-ai/dsh-typert-registry'
 - name: '@deepseek-ai/dsh-typert-loader'
 - name: '@deepseek-ai/dsh-api-gateway'
@@ -17,8 +18,25 @@
 - name: '@deepseek-ai/dsh-credentials-local'
 - name: '@deepseek-ai/dsh-llm'
 - name: '@deepseek-ai/dsh-llm-deepseek'
+- name: '@deepseek-ai/dsh-tools'
+- name: '@deepseek-ai/dsh-subagent'
+- name: '@deepseek-ai/dsh-attachment-local'
+- name: '@deepseek-ai/dsh-user-questions'
+- name: '@deepseek-ai/dsh-session-query-sqlite'
+  config:
+    path: ':memory:'
+    openAt: 'never'
 
-# ── 2. Web 宿主服务、存储与 API 传输网关 ───────────────────────────────────────
+# ── 2. 持久化存储与 Workspace 数据面 ──────────────────────────────────────────
+- name: '@deepseek-ai/dsh-storage'
+- name: '@deepseek-ai/dsh-storage-json'
+  config:
+    root: '.storage'
+- name: '@deepseek-ai/dsh-storage-domain'
+  config:
+    backend: 'json'
+
+# ── 3. Web 宿主服务、存储与 API 传输网关 ───────────────────────────────────────
 - name: '@deepseek-ai/dsh-host-webserver'
   config:
     host: '127.0.0.1'
@@ -28,6 +46,7 @@
   config:
     distIndex: 'D:\gh-ws\dsh-ws\deepseek-harness\apps\web\dist\index.html'
 
+- name: '@deepseek-ai/dsh-host-directory-picker'
 - name: '@deepseek-ai/dsh-host-apiproxy'
 - name: '@deepseek-ai/dsh-workspace'
 - name: '@deepseek-ai/dsh-session-projection-cache'
@@ -36,13 +55,13 @@
 - name: '@deepseek-ai/dsh-cordis-host-runner'
 - name: '@deepseek-ai/dsh-host-plugin-inventory'
 
-# ── 3. 浏览器端模块清单扫描器与 Web Shell ───────────────────────────────────────
+# ── 4. 浏览器端模块清单扫描器与 Web Shell ───────────────────────────────────────
 - name: '@deepseek-ai/dsh-client-modules'
 - name: '@deepseek-ai/dsh-client-connection'
 - name: '@deepseek-ai/dsh-client-runtime'
 - name: '@deepseek-ai/dsh-cordis-client-runner'
 
-# ── 4. 官方 DSH 浏览器微前端插槽与 UI 插件矩阵 (全套 26 个 UI 组件) ───────────────
+# ── 5. 官方 DSH 浏览器微前端插槽与 UI 插件矩阵 (全套 26 个 UI 组件) ───────────────
 # 核心上下文与本地化
 - name: '@deepseek-ai/dsh-client-locale'
 - name: '@deepseek-ai/dsh-client-ui-theme'
@@ -81,7 +100,7 @@
 - name: '@deepseek-ai/dsh-client-ui-settings-plugins'
 - name: '@deepseek-ai/dsh-client-ui-settings-plugin-inventory'
 
-# ── 5. 后端智能体基础设施与循环引擎 ──────────────────────────────────────────
+# ── 6. 后端智能体基础设施与循环引擎 ──────────────────────────────────────────
 - name: '@deepseek-ai/dsh-agent'
 
 - name: '@deepseek-ai/dsh-agent-presets'
