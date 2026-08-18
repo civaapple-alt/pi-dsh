@@ -270,8 +270,10 @@ async function main() {
     }
 
     ctx.webServer.tapIndex((html) => {
-      if (html.includes('window.__DSH_BOOT__')) return html
       const script = `<script>window.__DSH_BOOT__ = ${JSON.stringify({ rev: bootRev, entries: bootEntries })}</script>`
+      if (html.includes('window.__DSH_BOOT__')) {
+        return html.replace(/<script>window\.__DSH_BOOT__ = .*?<\/script>/, script)
+      }
       const head = html.indexOf('<head>')
       if (head !== -1) {
         return `${html.slice(0, head + 6)}${script}${html.slice(head + 6)}`
