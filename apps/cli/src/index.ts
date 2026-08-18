@@ -213,6 +213,22 @@ async function main() {
 
   if ((ctx as any).clientModules) {
     const cm = (ctx as any).clientModules
+    const origResolve = cm.resolvePkgJson?.bind(cm)
+    if (origResolve) {
+      cm.resolvePkgJson = (spec: string) => {
+        try {
+          return origResolve(spec)
+        } catch (e) {
+          if (dshPackageMap.has(spec)) {
+            const modPath = dshPackageMap.get(spec)!
+            const pkgDir = path.dirname(path.dirname(modPath))
+            const pkgJson = path.join(pkgDir, 'package.json')
+            if (fs.existsSync(pkgJson)) return pkgJson
+          }
+          throw e
+        }
+      }
+    }
     for (const entry of loaderEntries) {
       cm.dirty?.add(entry.options.name)
     }

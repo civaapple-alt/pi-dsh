@@ -7,8 +7,6 @@
 - name: '@deepseek-ai/dsh-system-prompt'
 - name: '@deepseek-ai/dsh-typert-registry'
 - name: '@deepseek-ai/dsh-typert-loader'
-- name: '@deepseek-ai/dsh-api-gateway'
-- name: '@deepseek-ai/dsh-api-remotes'
 - name: '@deepseek-ai/dsh-session'
 - name: '@deepseek-ai/dsh-agent-default-model'
   config:
@@ -55,9 +53,11 @@
 - name: '@deepseek-ai/dsh-cordis-host-runner'
 - name: '@deepseek-ai/dsh-host-plugin-inventory'
 
-# ── 4. 浏览器端模块清单扫描器与 Web Shell ───────────────────────────────────────
+# ── 4. 浏览器端模块清单扫描器、通信管道与 RPC 网关 ─────────────────────────────
 - name: '@deepseek-ai/dsh-client-modules'
 - name: '@deepseek-ai/dsh-client-connection'
+- name: '@deepseek-ai/dsh-api-gateway'
+- name: '@deepseek-ai/dsh-api-remotes'
 - name: '@deepseek-ai/dsh-client-runtime'
 - name: '@deepseek-ai/dsh-cordis-client-runner'
 
