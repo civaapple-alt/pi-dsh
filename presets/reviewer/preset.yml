@@ -1,2 +1,2 @@
-name: Code Reviewer Agent
-description: Read-only Code Inspector equipped with FileSystem and Search tools (no mutation tools).
+name: 代码审查与审计模式 (Reviewer)
+description: 安全只读探查智能体。仅配备文件浏览与代码全局检索工具，移除了文件写回与终端命令执行权限，专注安全审计与架构分析。

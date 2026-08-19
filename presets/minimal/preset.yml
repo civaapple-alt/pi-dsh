@@ -1,2 +1,2 @@
-name: Minimal Agent
-description: Minimalist Bash-only AI Agent.
+name: 极简终端运维模式 (Minimal)
+description: 轻量级单终端执行者。仅注入 Bash 命令行工具，大幅压缩 System Prompt 与工具声明 Token，专用于脚本批处理、环境探测与运维任务。
