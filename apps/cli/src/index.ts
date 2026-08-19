@@ -411,6 +411,7 @@ async function main() {
         provider: 'deepseek-official',
         model: model || 'deepseek-chat',
       },
+      setup: (agentCtx: Context) => ctx.agentPresets.mount(agentCtx, preset).then(() => undefined),
       meta: {
         cwd: process.cwd(),
         agentPreset: preset,
@@ -463,6 +464,7 @@ async function main() {
         provider: 'deepseek-official',
         model: model || 'deepseek-chat',
       },
+      setup: (agentCtx: Context) => ctx.agentPresets.mount(agentCtx, preset).then(() => undefined),
       meta: {
         cwd: process.cwd(),
         agentPreset: preset,
@@ -544,6 +546,7 @@ async function main() {
                   provider: 'deepseek-official',
                   model: model || 'deepseek-chat',
                 },
+                setup: (agentCtx: Context) => ctx.agentPresets.mount(agentCtx, preset).then(() => undefined),
                 meta: {
                   cwd: process.cwd(),
                   agentPreset: preset,

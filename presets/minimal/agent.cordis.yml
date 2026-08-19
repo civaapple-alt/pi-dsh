@@ -6,8 +6,6 @@
   config:
     text: >-
       You are a lightweight terminal operations agent powered by {{model}}. Your working directory is {{cwd}}. Directly execute terminal commands using available tools to answer questions and complete tasks.
-- name: '@deepseek-ai/dsh-system-prompt'
-- name: '@deepseek-ai/dsh-tools'
 - name: '@deepseek-ai/dsh-tool-bash'
   disabled: !!js process.platform === 'win32'
 - name: '@deepseek-ai/dsh-tool-pwsh'
