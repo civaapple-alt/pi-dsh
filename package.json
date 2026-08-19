@@ -8,7 +8,7 @@
     "start": "tsx apps/cli/src/index.ts --profile web --preset standard",
     "dev": "tsx apps/cli/src/index.ts --profile web --preset standard",
     "headless": "tsx apps/cli/src/index.ts --profile headless --preset standard",
-    "pi": "tsx apps/cli/src/index.ts --preset standard"
+    "pi": "tsx apps/cli/src/index.ts --profile headless --preset standard"
   },
   "dependencies": {
     "@deepseek-ai/cordis": "^4.0.1",

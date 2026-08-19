@@ -122,6 +122,8 @@ function parseArgs() {
       preset = args[++i]
     } else if (arg === '--model' && i + 1 < args.length) {
       model = args[++i]
+    } else if (arg === '-i' || arg === '--interactive' || arg === '--repl') {
+      profile = 'headless'
     } else if (arg === '--help' || arg === '-h') {
       console.log(`
 Usage: pi-dsh [options] [task...]
@@ -130,6 +132,7 @@ Options:
   --profile <name>   Profile name to load (web | headless) [default: web]
   --preset <name>    Agent capability preset (standard | reviewer | minimal | coder) [default: standard]
   --model <name>     LLM model name [default: deepseek-chat]
+  -i, --repl         Launch interactive CLI REPL mode directly
   --help, -h         Show help
 
 Examples:
