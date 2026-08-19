@@ -43,7 +43,8 @@
 ### 1. 安装依赖
 
 ```bash
-cd D:\gh-ws\dsh-ws\pi-dsh
+git clone https://github.com/civaapple-alt/pi-dsh.git
+cd pi-dsh
 pnpm install
 ```
 

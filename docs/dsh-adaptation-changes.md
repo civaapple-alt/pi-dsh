@@ -100,7 +100,7 @@ DSH 原生设置弹窗将面板宽度硬编码为 `800px`，内部子容器限�
 
 ### 5. 插件动态扫描发现与跨仓库开发联动构建规范 (Plugin Discovery & Build Workflow)
 
-#### 5.1 为什么无需全局安装（`C:\nvm4w\nodejs\node_modules` 找不到包）？
+#### 5.1 为什么无需全局安装（全局 `node_modules` 找不到包）？
 - `@deepseek-ai/dsh-*` 是 `deepseek-harness` 内部的 pnpm workspace 私有包，**不需要、也不应该通过 `npm i -g` 安装到 Node 全局**。
 - `pi-dsh/apps/cli/src/index.ts` 在启动时通过 `buildDshPackageMap()` 自动扫描物理路径 `../deepseek-harness/packages` 和 `../deepseek-harness/vendor` 下所有 `package.json`，并自动劫持 `loader.internal.import`，实现直接对本地 Monorepo 物理模块的动态直连加载。
 
@@ -111,7 +111,7 @@ DSH 原生设置弹窗将面板宽度硬编码为 `800px`，内部子容器限�
   apps/cli/src/index.ts (buildDshPackageMap)
                      │
                      ▼
-  dsh-ws/deepseek-harness/packages/core/agent/lib/index.js (物理直接加载)
+  deepseek-harness/packages/core/agent/lib/index.js (物理直接加载)
 ```
 
 #### 5.2 插件代码更新后，是否需要在 DSH 仓库执行 `pnpm run build`？
@@ -132,12 +132,12 @@ DSH 原生设置弹窗将面板宽度硬编码为 `800px`，内部子容器限�
   ```
 - **全量重构 DSH 所有包**：
   ```bash
-  cd D:\gh-ws\dsh-ws\deepseek-harness
+  cd ../deepseek-harness
   pnpm run build
   ```
 - **重启 Pi-DSH Web 服务生效**：
   ```bash
-  cd D:\gh-ws\dsh-ws\pi-dsh
+  cd ../pi-dsh
   pnpm start
   ```
 

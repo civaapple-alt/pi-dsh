@@ -1,7 +1,7 @@
 # Pi (earendil-works/pi) vs Pi-DSH 功能对标矩阵与预设体系文档
 
 **版本**：v0.4.0  
-**基准参考**：[`earendil-works/pi`](https://github.com/earendil-works/pi) (本地镜像 `D:\gh-ws\pi`)  
+**基准参考**：[`earendil-works/pi`](https://github.com/earendil-works/pi) (Pi 官方源码库)  
 **目标**：100% 基于官方 Cordis 微内核与 DSH 插件生态，实现对标 Pi 核心能力 80%+ 并提供现代化 Web GUI 与多预设支持。
 
 ---
@@ -94,7 +94,7 @@ Pi 官方在 CLI 模式下通过不同配置和参数覆盖不同的开发工作
 
 ### 1. Web GUI 界面启动 (默认装配 `standard` 预设)
 ```bash
-cd D:\gh-ws\dsh-ws\pi-dsh
+cd pi-dsh
 pnpm start
 # 浏览器访问 http://localhost:3000，在界面左下角「设置」->「Agent 预设」中可随时一键切换预设
 ```
