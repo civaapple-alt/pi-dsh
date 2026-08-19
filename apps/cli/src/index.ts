@@ -208,6 +208,12 @@ async function main() {
     }
   }
 
+  loader.entries = function* () {
+    for (const item of loadedEntriesList) {
+      yield item
+    }
+  }
+
   // Allow Cordis event loop to activate injected services and flush client-modules
   await new Promise(r => setTimeout(r, 50))
 
