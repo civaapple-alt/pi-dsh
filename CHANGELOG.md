@@ -6,6 +6,28 @@
 
 ---
 
+## [0.4.2] - 2026-08-19
+
+### 🎯 流式事件渲染、预设工具挂载与 Function Calling 闭环 (Event Streaming & Tool Seam Parity)
+
+- **智能体会话流式输出与全周期等待 (`whenIdle` Synchronization & Live Streaming)**：
+  - **进程生命周期等待**：解决 `agent.followup(...)` 同步投递导致 Node.js 进程瞬间退出（`process.exit(0)`）的致命缺陷，通过 `await agent.whenIdle()` 确保智能体完整跑完思考、多轮工具调用、观察结果回填与最终回复生成流程。
+  - **核心事件通道接入 (`session/event`)**：全面对接 DSH 官方 `session/event` 核心分发通道，在控制台实现高对比度流式实时渲染：
+    - 灰度显示大模型思考流（`reasoning-delta` CoT）；
+    - 亮白显示最终解答文本（`text-delta`）；
+    - 亮青标记结构化工具调用（`⚡ [Tool Call] <toolName>`）；
+    - 亮绿标记工具执行观察结果（`✔ [Observation] <output>`）。
+
+- **预设生命周期钩子挂载 (`setup` Hook & Tool Exposure)**：
+  - **Scoped 预设挂载补齐**：在 `ctx.agents.create` 中显式注入 `setup: (agentCtx) => ctx.agentPresets.mount(agentCtx, preset)` 生命周期钩子，确保智能体在其独立作用域内正确挂载预设所声明的全部工具链（`pwsh`、`bash`、`view_file`、`str_replace_editor`、`todo_write`、`fs_search` 等）。
+  - **彻底根除 DSML 标记输出**：解决了此前因 `tools: []` 为空导致大模型在未拿到工具 schema 时退化输出原生 `<｜｜DSML｜｜tool_calls><｜｜DSML｜｜invoke name="exec_command">` 伪代码标记的问题，实现大模型原生 Function Calling 结构化调用的端到端闭环。
+
+- **预设 YAML 插件层级净化与人设增强 (`@deepseek-ai/dsh-persona`)**：
+  - 修正 `presets/minimal/agent.cordis.yml` 中的插件层级，剔除重复的宿主全局服务（`dsh-system-prompt`、`dsh-tools` 由 Host Profile 全局加载），避免 Cordis Loader 报 `service already registered` 挂载异常。
+  - 在 `presets/standard`、`presets/coder`、`presets/minimal` 中统一注入 `@deepseek-ai/dsh-persona`，明确告知模型当前工作区 `{{cwd}}` 与运行环境，引导其主动调用工具完成任务。
+
+---
+
 ## [0.4.1] - 2026-08-19
 
 ### 🚀 自动化无头执行与跨平台终端驱动全面打通 (Headless Profile & Shell Seam Parity)
