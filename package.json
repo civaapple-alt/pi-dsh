@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm -r --filter=\"./packages/**\" run build",
+    "build": "pnpm -r run build",
     "start": "tsx apps/cli/src/index.ts --profile web --preset standard",
     "dev": "tsx apps/cli/src/index.ts --profile web --preset standard",
     "headless": "tsx apps/cli/src/index.ts --profile headless --preset standard",

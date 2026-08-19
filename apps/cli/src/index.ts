@@ -6,6 +6,19 @@ import readline from 'node:readline'
 import yaml from 'js-yaml'
 import dotenv from 'dotenv'
 
+declare module '@deepseek-ai/cordis' {
+  interface Context {
+    webServer?: any
+    agents?: any
+    loader?: any
+    storage?: any
+    [key: string]: any
+  }
+  interface Events {
+    [key: string]: any
+  }
+}
+
 // Load .env from workspace root if present
 dotenv.config({ path: path.resolve(process.cwd(), '.env') })
 dotenv.config({ path: path.resolve(process.cwd(), '../.env') })
@@ -325,7 +338,7 @@ async function main() {
       }
     }
 
-    ctx.webServer.tapIndex((html) => {
+    ctx.webServer.tapIndex((html: string) => {
       const script = `<script>window.__DSH_BOOT__ = ${JSON.stringify({ rev: bootRev, entries: bootEntries })}</script>`
       if (html.includes('window.__DSH_BOOT__')) {
         return html.replace(/<script>window\.__DSH_BOOT__ = .*?<\/script>/, script)
@@ -341,9 +354,9 @@ async function main() {
       ctx.webServer.register({
         kind: 'exact',
         path: '/api/pluginGraph',
-        handler: async (_req, res) => {
+        handler: async (_req: any, res: any) => {
           try {
-            const { buildPluginGraph } = await import('./graph.ts')
+            const { buildPluginGraph } = await import('./graph.js')
             const graphData = buildPluginGraph(ctx, profileFile, dshPackageMap)
             res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' })
             res.end(JSON.stringify({ ok: true, value: graphData }))
@@ -359,7 +372,7 @@ async function main() {
       ctx.webServer.register({
         kind: 'prefix',
         path: '/plugins',
-        handler: async (req, res) => {
+        handler: async (req: any, res: any) => {
           const url = new URL(req.url || '', `http://${req.headers.host}`)
           const match = url.pathname.match(/^\/plugins\/(.+?)\/client\.js$/)
           if (match) {
@@ -400,19 +413,19 @@ async function main() {
     })
     const agent = handle.agent
 
-    ctx.on('agent/thinking', (a, thinking) => {
+    ctx.on('agent/thinking', (a: any, thinking: any) => {
       process.stdout.write(`\x1b[90m${thinking}\x1b[0m`)
     })
 
-    ctx.on('agent/chunk', (a, chunk) => {
+    ctx.on('agent/chunk', (a: any, chunk: any) => {
       process.stdout.write(chunk)
     })
 
-    ctx.on('agent/tool-call', (a, call) => {
+    ctx.on('agent/tool-call', (a: any, call: any) => {
       console.log(`\n\x1b[36m⚡ [Tool Call] ${call.name}\x1b[0m: ${JSON.stringify(call.arguments)}`)
     })
 
-    ctx.on('agent/tool-result', (a, call, res) => {
+    ctx.on('agent/tool-result', (a: any, call: any, res: any) => {
       console.log(`\x1b[32m✔ [Observation]\x1b[0m ${res.content.slice(0, 300)}${res.content.length > 300 ? '...' : ''}\n`)
     })
 
@@ -434,19 +447,19 @@ async function main() {
     })
     let agent = handle.agent
 
-    ctx.on('agent/thinking', (a, thinking) => {
+    ctx.on('agent/thinking', (a: any, thinking: any) => {
       process.stdout.write(`\x1b[90m${thinking}\x1b[0m`)
     })
 
-    ctx.on('agent/chunk', (a, chunk) => {
+    ctx.on('agent/chunk', (a: any, chunk: any) => {
       process.stdout.write(chunk)
     })
 
-    ctx.on('agent/tool-call', (a, call) => {
+    ctx.on('agent/tool-call', (a: any, call: any) => {
       console.log(`\n\x1b[36m⚡ [Tool Call] ${call.name}\x1b[0m: ${JSON.stringify(call.arguments)}`)
     })
 
-    ctx.on('agent/tool-result', (a, call, res) => {
+    ctx.on('agent/tool-result', (a: any, call: any, res: any) => {
       console.log(`\x1b[32m✔ [Observation]\x1b[0m ${res.content.slice(0, 300)}${res.content.length > 300 ? '...' : ''}\n`)
     })
 
