@@ -237,7 +237,38 @@
 
 ---
 
-### 4. 【功能增强】可视化能力接缝与拓扑依赖图 (可选)
+### 4. 【文件系统容错】Windows 根目录权限异常保护 (`packages/fs/fs-local`)
+
+📄 **修改文件**：`packages/fs/fs-local/src/fsio.ts`
+
+当模型在 Windows 环境下查看根目录（如 `D:\` 或 `/`）时，原版在遇到受系统保护的系统文件夹（如 `System Volume Information`）时会抛出未捕获的 `EPERM` 异常导致整目录浏览崩溃。修改为优雅记录为 `other` 类型：
+
+```diff
+--- a/packages/fs/fs-local/src/fsio.ts
++++ b/packages/fs/fs-local/src/fsio.ts
+@@ -312,8 +312,15 @@
+         ...(childInfo ? { version: childInfo.version } : {}),
+         ...(childInfo?.type === 'file' ? { size: childInfo.size } : {}),
+       })
+-    } catch (error: unknown) {
+-      throw listingIoError(join(target.displayPath, entry.name), error)
++    } catch {
++      result.push({
++        name: entry.name,
++        type: 'other',
++        target: {
++          displayPath: join(target.displayPath, entry.name),
++          targetKey: FsTargetKey(join(target.targetKey, entry.name)),
++        },
++      })
+     }
+     throwIfAborted(signal, 'list')
+   }
+```
+
+---
+
+### 5. 【功能增强】可视化能力接缝与拓扑依赖图 (可选)
 
 如需在设置中心开启「🌐 依赖图」：
 1. 复制组件代码至：`packages/client/ui-settings-plugin-inventory/src/client/PluginDependencyGraphTab.tsx`；
