@@ -6,6 +6,42 @@
 
 ---
 
+## [0.4.0] - 2026-08-19
+
+### 🌐 核心特性：Cordis 插件与能力接缝可视化依赖图 (Interactive Capability Seam Dependency Graph)
+
+- **Koishi 风格交互式插件拓扑依赖图 (`PluginDependencyGraphTab`)**：
+  - 在「设置」->「插件」中新增 **「🌐 依赖图」** Tab，基于 Canvas 2D 物理与分层渲染引擎，提供 60fps 丝滑的缩放、平移、节点拖拽与搜索高亮。
+  - **支持双布局引擎**：
+    - **🌲 分层拓扑流 (Hierarchical DAG)**（默认）：采用四列结构化流水线（`1. 宿主底层驱动 Providers` $\to$ `2. 服务面与通信网关` $\to$ `3. 智能体与工具` $\to$ `4. 浏览器微前端 UI 矩阵`），使用平滑三次贝塞尔曲线连接依赖，彻底消除 70+ 节点的杂乱感。
+    - **🪐 物理星系图 (Force Clustered)**：传统力导向天体引力拓扑，支持自由拉扯探索。
+
+- **深度集成 DSH 能力接缝三位一体 (Capability Seam Roles)**：
+  - 自动识别并标注每个插件的 Seam 角色：
+    - **⚡ 驱动实现 (Provider)**：底层 OS / 沙箱执行能力提供方（`fs-local`, `subprocess-local`, `shell-env`, `llm-deepseek` 等）。
+    - **🔨 业务消费 (Consumer)**：面向大模型的工具插件与前端微前端组件（`tool-fs`, `tool-bash`, `client-ui-*` 等）。
+    - **📐 服务契约 (Definition)**：纯 TypeScript 接口契约与抽象基类（`dsh-fs`, `dsh-shell`, `dsh-llm` 等）。
+    - **🧩 框架编排 (Framework)**：容器、Profile 加载与通信总线。
+  - 工具栏提供 **能力接缝视角**（`全部` / `⚡ 驱动实现` / `🔨 业务消费`）与 **功能分类药丸标签** 一键过滤高亮。
+  - **右侧检查器抽屉 (Inspector Drawer)**：点击任意节点即时展示其 Seam 角色定位、职责说明、导出的 `ctx.serviceName`、消费的 `inject` 依赖与 YAML 配置快照。
+
+- **浅色与深色双主题原生适配 (Adaptive Dual Theme)**：
+  - 挂载 `useIsDarkMode` 监听器，通过 `MutationObserver` 毫秒级动态感知宿主主题切换。
+  - 浅色模式下提供清爽马卡龙淡彩卡片与柔和网格，深色模式下提供幽邃夜间配色与极光霓虹光晕。
+
+### 🐛 运行态缺陷修复与 RPC 路由补齐 (Bugfixes & RPC Gateways)
+
+- **官方插件列表数据空白修复 (`PluginInventorySettingsTab`)**：
+  - 在 `apps/cli/src/index.ts` 中为 `loader.entries` 绑定生成器迭代器，解决后端 `pluginInventory/list` 返回空数组的问题，使「插件列表」面板完整展示 73 个已加载插件与其运行态光纤阶段（`fiberPhase: 'active'`）。
+- **Slash Commands 远程 RPC 路由修复 (`/api/commands/list` 404)**：
+  - 在 `profiles/web.yml` 中挂载官方 `@deepseek-ai/dsh-commands` 插件，打通前端 `ui-commands` 的 Slash 命令注册与自动补全。
+- **动态插件运行器 RPC 路由补齐 (`dynamicCordisRunner/*` 404)**：
+  - 在 `profiles/web.yml` 中挂载 `@deepseek-ai/dsh-cordis-host-runner` 与 `@deepseek-ai/dsh-message-feedback`，解决前端 `dsh-cordis-client-runner` 启动时调用自检接口报 404 的问题。
+- **Canvas 被动事件监听警告消除 (`passive event listener`)**：
+  - 将画布滚轮缩放监听改为原生 `{ passive: false }` 事件绑定，消除控制台 `Unable to preventDefault inside passive event listener` 警告。
+
+---
+
 ## [0.3.0] - 2026-08-18
 
 ### 🐛 关键缺陷修复与微前端生态全链路闭环 (Bugfixes & Micro-Frontend Polish)

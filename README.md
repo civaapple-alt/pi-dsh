@@ -8,15 +8,20 @@
 
 ## 🌟 核心特性
 
-- **100% 官方 DSH 插件全家桶**：无任何自制或阉割版本，直接接入官方 `@deepseek-ai/dsh-agent`、`@deepseek-ai/dsh-agent-loop`、`@deepseek-ai/dsh-tools`、`@deepseek-ai/dsh-llm-deepseek` 等 50+ 核心插件；
-- **官方浏览器微前端插槽矩阵（34 UI 插件）**：
+- **100% 官方 DSH 插件全家桶 (73 插件)**：无任何自制或阉割版本，直接装载 37 个宿主插件与 36 个浏览器端微前端插件，运行于统一的 `@deepseek-ai/cordis` (v4.0.1) 微内核之上；
+- **官方浏览器微前端插槽矩阵（36 UI 插件）**：
   - **全局外壳与框架**：`ui-layout`（向 `root` 插槽注入 AppFrame）、`ui-sidebar`、`ui-workspace`、`ui-theme`（暗色/亮色切换）、`ui-locale`（国际化）；
   - **应用内文件/目录浏览器**：`ui-directory-picker-browse` + `host-directory-picker-browse` 驱动面包屑导航与多级目录选择；
   - **会话与工具视图**：流式思维链（Thinking）、Diff 对比、终端仿真、产物交付、计划模式与目标看板；
-  - **设置中心**：常规偏好、模型配置、插件清单（Plugin Inventory）实时查看；
+  - **设置中心与插件清单**：常规偏好、模型配置、插件清单（Plugin Inventory）实时查看；
+- **🌐 交互式能力接缝与插件依赖图 (Capability Seam Graph)**：
+  - **原生嵌入设置中心**：在「设置」->「插件」->「🌐 依赖图」中提供 60fps 交互式架构拓扑查看器；
+  - **分层拓扑流 (Hierarchical DAG)**：四列结构化流水线（底层驱动 $\to$ 服务面与通信 $\to$ 智能体与工具 $\to$ 微前端矩阵），彻底消除杂乱；
+  - **DSH 能力接缝三位一体**：精准辨析 `⚡ Provider (驱动实现)`、`🔨 Consumer (业务消费)`、`📐 Definition (契约定义)` 与 `🧩 Framework`，支持单节点完整依赖链溯源；
+  - **浅色/深色主题动态自适应**：支持全局主题变更毫秒级自适应变色；
 - **两级解耦配置治理体系**：
   - **Profiles (`profiles/*.yml`)**：基础设施层组合，支持 `web`（图形交互）与 `headless`（单任务 / 命令行 REPL）；
-  - **Presets (`presets/*/agent.cordis.yml`)**：Agent 角色与能力预设，支持 `coder`（完整开发）、`reviewer`（代码审查）与 `minimal`（极简终端）；
+  - **Presets (`presets/*/agent.cordis.yml`)**：Agent 角色与能力预设，支持 `standard`/`coder`（完整开发）、`reviewer`（代码审查）与 `minimal`（极简终端）；
 - **动态模块拓扑引导器（`apps/cli`）**：
   - 自动扫描解析 Monorepo 模块并按依赖拓扑注入 `window.__DSH_BOOT__`；
   - 内置动态文件修改短哈希（`rev`）缓存失效机制。
