@@ -195,7 +195,31 @@ async function main() {
         mod = await import(target)
       }
       const plugin = mod.default || mod
-      const fiber = await ctx.plugin(plugin, entry.config)
+      const config = entry.config ? { ...entry.config } : undefined
+
+      // Auto-resolve relative or omitted distIndex for frontend-static
+      if (target.includes('frontend-static')) {
+        let distIndex = config?.distIndex
+        if (!distIndex || !path.isAbsolute(distIndex)) {
+          const candidatePaths = [
+            distIndex ? path.resolve(process.cwd(), distIndex) : '',
+            path.resolve(process.cwd(), '../deepseek-harness/apps/web/dist/index.html'),
+            path.resolve(process.cwd(), 'apps/web/dist/index.html'),
+          ].filter(Boolean)
+
+          for (const p of candidatePaths) {
+            if (fs.existsSync(p)) {
+              distIndex = p
+              break
+            }
+          }
+        }
+        if (config) {
+          config.distIndex = distIndex
+        }
+      }
+
+      const fiber = await ctx.plugin(plugin, config)
       loadedEntriesList.push({
         id: target,
         options: { name: target },

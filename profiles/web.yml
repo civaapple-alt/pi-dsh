@@ -45,7 +45,7 @@
 
 - name: '@deepseek-ai/dsh-host-frontend-static'
   config:
-    distIndex: 'D:\gh-ws\dsh-ws\deepseek-harness\apps\web\dist\index.html'
+    distIndex: '../deepseek-harness/apps/web/dist/index.html'
 
 - name: '@deepseek-ai/dsh-host-directory-picker-browse'
 - name: '@deepseek-ai/dsh-host-apiproxy'
