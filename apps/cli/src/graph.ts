@@ -3,11 +3,14 @@ import path from 'node:path'
 import yaml from 'js-yaml'
 import type { Context } from '@deepseek-ai/cordis'
 
+export type SeamRole = 'definition' | 'provider' | 'consumer' | 'framework'
+
 export interface GraphNode {
   id: string
   label: string
   fullName: string
   category: 'host-core' | 'client-ui' | 'tool-seam' | 'storage' | 'agent-loop' | 'extension'
+  seamRole: SeamRole
   isClient: boolean
   status: 'active' | 'pending' | 'failed'
   provides: string[]
@@ -36,11 +39,14 @@ export interface PluginGraphData {
     totalLinks: number
     activeCount: number
     pendingCount: number
+    definitionsCount: number
+    providersCount: number
+    consumersCount: number
   }
 }
 
 /**
- * Build the full Cordis Plugin & Service Dependency Graph data
+ * Build the full Cordis Plugin & Service Dependency Graph data with Capability Seam Roles
  */
 export function buildPluginGraph(
   ctx: Context,
@@ -62,6 +68,40 @@ export function buildPluginGraph(
     if (name.includes('agent')) return 'agent-loop'
     if (name.includes('cordis') || name.includes('workflow') || name.includes('deliverables')) return 'extension'
     return 'host-core'
+  }
+
+  // Helper to determine Capability Seam Role
+  function getSeamRole(name: string, isClient: boolean, provides: string[], injects: string[]): SeamRole {
+    if (isClient) return 'consumer'
+    if (name.includes('tool-') || name.includes('apiproxy') || name.includes('agent-loop')) return 'consumer'
+    if (
+      name.includes('-local') ||
+      name.includes('shell-env') ||
+      name.includes('llm-deepseek') ||
+      name.includes('storage-json') ||
+      name.includes('settings-file') ||
+      name.includes('session-query') ||
+      name.includes('host-webserver') ||
+      name.includes('token-meter') ||
+      name.includes('compaction')
+    ) {
+      return 'provider'
+    }
+    if (
+      name === '@deepseek-ai/dsh-fs' ||
+      name === '@deepseek-ai/dsh-subprocess' ||
+      name === '@deepseek-ai/dsh-shell' ||
+      name === '@deepseek-ai/dsh-llm' ||
+      name === '@deepseek-ai/dsh-storage' ||
+      name === '@deepseek-ai/dsh-session' ||
+      name === '@deepseek-ai/dsh-subagent' ||
+      name === '@deepseek-ai/dsh-attachment' ||
+      name === '@deepseek-ai/dsh-tools'
+    ) {
+      return 'definition'
+    }
+    if (provides.length > 0) return 'provider'
+    return 'framework'
   }
 
   // 1. Process all plugins from Profile
@@ -127,7 +167,6 @@ export function buildPluginGraph(
     if (isClient && Array.isArray(pkg?.dsh?.client?.inject)) {
       injects.push(...pkg.dsh.client.inject)
     } else {
-      // Common host injects
       if (name.includes('apiproxy')) {
         injects.push('agentDefaultModel', 'agents', 'attachments', 'directoryPicker', 'llm', 'sessions', 'subagents', 'tools', 'userQuestions', 'workspaceRegistry')
       } else if (name.includes('tool-fs-search')) {
@@ -156,11 +195,14 @@ export function buildPluginGraph(
       serviceConsumers.get(inj)!.add(name)
     }
 
+    const seamRole = getSeamRole(name, isClient, provides, injects)
+
     nodes.push({
       id: name,
       label: shortName,
       fullName: name,
       category: getCategory(name, isClient),
+      seamRole,
       isClient,
       status: entry.disabled ? 'pending' : 'active',
       provides,
@@ -215,6 +257,9 @@ export function buildPluginGraph(
       totalLinks: links.length,
       activeCount: nodes.filter(n => n.status === 'active').length,
       pendingCount: nodes.filter(n => n.status !== 'active').length,
+      definitionsCount: nodes.filter(n => n.seamRole === 'definition').length,
+      providersCount: nodes.filter(n => n.seamRole === 'provider').length,
+      consumersCount: nodes.filter(n => n.seamRole === 'consumer').length,
     },
   }
 }
