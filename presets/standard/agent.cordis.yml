@@ -8,6 +8,7 @@
 
 # 2. Terminal & Process Tools
 - name: '@deepseek-ai/dsh-tool-bash'
+- name: '@deepseek-ai/dsh-tool-pwsh'
 
 # 3. Code Search & Navigation Tools
 - name: '@deepseek-ai/dsh-tool-fs-search'
