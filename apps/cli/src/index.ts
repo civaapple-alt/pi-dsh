@@ -219,6 +219,14 @@ async function main() {
         }
       }
 
+      // Auto-resolve relative roots for agent-presets
+      if (target.includes('agent-presets') && config?.roots && Array.isArray(config.roots)) {
+        config.roots = config.roots.map((r: any) => ({
+          ...r,
+          path: r.path ? (path.isAbsolute(r.path) ? r.path : path.resolve(process.cwd(), r.path)) : path.resolve(process.cwd(), 'presets'),
+        }))
+      }
+
       const fiber = await ctx.plugin(plugin, config)
       loadedEntriesList.push({
         id: target,

@@ -117,7 +117,7 @@
   config:
     default: standard
     roots:
-      - path: 'D:\gh-ws\dsh-ws\pi-dsh\presets'
+      - path: 'presets'
         trust: system
 
 - name: '@deepseek-ai/dsh-agent-loop'
