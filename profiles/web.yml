@@ -53,6 +53,8 @@
 - name: '@deepseek-ai/dsh-session-projection-cache'
 - name: '@deepseek-ai/dsh-session-stats'
 - name: '@deepseek-ai/dsh-commands'
+- name: '@deepseek-ai/dsh-message-feedback'
+- name: '@deepseek-ai/dsh-cordis-host-runner'
 - name: '@deepseek-ai/dsh-host-plugin-inventory'
 
 # ── 4. 浏览器端模块清单扫描器、通信管道与 RPC 网关 ─────────────────────────────
