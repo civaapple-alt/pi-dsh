@@ -143,3 +143,8 @@ DSH 采用独特的双端双内核架构：
    - 开发者如需编写新的前端卡片或小部件，只需在 `packages/` 下创建带有 `dsh.client` 的插件，`apps/cli` 会自动扫描并将其动态挂载到对应的 UI 插槽中。
 3. **极速构建与轻量化启动**：
    - 彻底移除冗余的本地存根插件，`pnpm install` 耗时压缩至 500ms 内，单命令 `pnpm start` 即可秒级拉起完整的官方 Web GUI。
+4. **Monorepo 插件动态直连与跨仓库构建协同**：
+   - **动态发现**：`apps/cli` 启动时自动扫描 `../deepseek-harness/packages` 建立物理包映射表（`dshPackageMap`），并拦截 `loader.internal.import`，无需向 npm 发布或全局安装即可热加载。
+   - **构建触发时机**：
+     - 修改 **浏览器微前端插件**（`packages/client/ui-*`）：**必须构建**（`pnpm --filter <pkg> exec tsdown`）生成 `lib/client.js` 给前端路由分发；
+     - 修改 **宿主后端插件**（`packages/core/*` 等）：若包内存在历史 `lib/` 产物，必须重新 `pnpm run build`，若无 `lib/` 产物则 `tsx` 直接热执行 `src/index.ts`。

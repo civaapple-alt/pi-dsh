@@ -98,6 +98,51 @@ DSH 原生设置弹窗将面板宽度硬编码为 `800px`，内部子容器限�
 
 ---
 
+### 5. 插件动态扫描发现与跨仓库开发联动构建规范 (Plugin Discovery & Build Workflow)
+
+#### 5.1 为什么无需全局安装（`C:\nvm4w\nodejs\node_modules` 找不到包）？
+- `@deepseek-ai/dsh-*` 是 `deepseek-harness` 内部的 pnpm workspace 私有包，**不需要、也不应该通过 `npm i -g` 安装到 Node 全局**。
+- `pi-dsh/apps/cli/src/index.ts` 在启动时通过 `buildDshPackageMap()` 自动扫描物理路径 `../deepseek-harness/packages` 和 `../deepseek-harness/vendor` 下所有 `package.json`，并自动劫持 `loader.internal.import`，实现直接对本地 Monorepo 物理模块的动态直连加载。
+
+```text
+  profiles/web.yml ('@deepseek-ai/dsh-agent')
+                     │
+                     ▼
+  apps/cli/src/index.ts (buildDshPackageMap)
+                     │
+                     ▼
+  dsh-ws/deepseek-harness/packages/core/agent/lib/index.js (物理直接加载)
+```
+
+#### 5.2 插件代码更新后，是否需要在 DSH 仓库执行 `pnpm run build`？
+
+这取决于你修改的是 **宿主后端插件** 还是 **浏览器微前端 UI 插件**：
+
+| 插件类别 | 典型模块 | 是否需要 `pnpm run build`？ | 原因与说明 |
+|---|---|---|---|
+| **🌐 浏览器微前端 UI 插件** | `packages/client/ui-*` (如 `ui-settings-plugin-inventory`, `ui-conversation`) | **必须构建** ⚠️ | 浏览器无法直接运行 TSX/React 源码，微前端通过 `/plugins/<name>/client.js` 路由向浏览器分发 JS Bundle。修改 `src/client/*` 后必须生成最新的 `lib/client.js`。 |
+| **🖥️ 宿主后端/核心插件** | `packages/core/*`, `packages/host/*`, `packages/preset/*` | **视情况而定** 💡 | 启动器加载优先级为：`优先 lib/index.js` $\to$ `回退 src/index.ts`。<br>1. 若包内已存在历史 `lib/index.js`，**必须重新 build**，否则会继续运行旧的 `lib/` 产物；<br>2. 若包内无 `lib/` 目录，`tsx` 运行时会直接即时编译运行最新的 `src/index.ts`。 |
+
+#### 5.3 常用敏捷联动构建命令
+
+- **只重新构建修改的微前端 UI 单包 (极速 20ms)**：
+  ```bash
+  # 在 deepseek-harness 根目录下或具体包目录下
+  pnpm --filter @deepseek-ai/dsh-client-ui-settings-plugin-inventory exec tsdown
+  ```
+- **全量重构 DSH 所有包**：
+  ```bash
+  cd D:\gh-ws\dsh-ws\deepseek-harness
+  pnpm run build
+  ```
+- **重启 Pi-DSH Web 服务生效**：
+  ```bash
+  cd D:\gh-ws\dsh-ws\pi-dsh
+  pnpm start
+  ```
+
+---
+
 ## 📌 总结与兼容性保障
 
 上述所有改动均严格遵循 **“基础优先、规范自洽、零副作用”** 原则：
