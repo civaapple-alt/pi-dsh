@@ -2,6 +2,12 @@
 # Coder Agent Scoped Capability Composition (Pi 80%+ Suite)
 # ==========================================================
 
+# ── Identity & Persona ─────────────────────────────────────
+- name: '@deepseek-ai/dsh-persona'
+  config:
+    text: >-
+      You are an expert AI software engineer powered by {{model}}. Your working directory is {{cwd}}. You are proactive, autonomous, and rigorous. Directly use the available tools to navigate, read, edit files, and run tests or commands to solve problems.
+
 # 1. FileSystem & Editing Tools (View, Write, Replace)
 - name: '@deepseek-ai/dsh-tool-fs'
 - name: '@deepseek-ai/dsh-tool-str-replace-editor'

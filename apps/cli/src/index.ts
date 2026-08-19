@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { Context } from '@deepseek-ai/cordis'
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import readline from 'node:readline'
@@ -406,6 +407,10 @@ async function main() {
     console.log(`\n\x1b[33m[Task]\x1b[0m ${task}\n`)
     const handle = await ctx.agents.create({
       sessionId: `cli-${Date.now()}` as any,
+      agentOptions: {
+        provider: 'deepseek-official',
+        model: model || 'deepseek-chat',
+      },
       meta: {
         cwd: process.cwd(),
         agentPreset: preset,
@@ -413,23 +418,37 @@ async function main() {
     })
     const agent = handle.agent
 
-    ctx.on('agent/thinking', (a: any, thinking: any) => {
-      process.stdout.write(`\x1b[90m${thinking}\x1b[0m`)
+    ctx.on('session/event', (_session: any, event: any) => {
+      if (event.type === 'assistant/chunk') {
+        const chunk = event.data?.chunk
+        if (chunk?.type === 'reasoning-delta' && chunk.text) {
+          process.stdout.write(`\x1b[90m${chunk.text}\x1b[0m`)
+        } else if (chunk?.type === 'text-delta' && chunk.text) {
+          process.stdout.write(chunk.text)
+        }
+      } else if (event.type === 'tool/call') {
+        const name = event.data?.name || event.data?.call?.name || 'tool'
+        const args = event.data?.arguments || event.data?.call?.arguments || {}
+        console.log(`\n\x1b[36m⚡ [Tool Call] ${name}\x1b[0m: ${JSON.stringify(args)}`)
+      } else if (event.type === 'tool/result') {
+        const content = event.data?.content || event.data?.result?.content || JSON.stringify(event.data)
+        const text = typeof content === 'string' ? content : JSON.stringify(content)
+        console.log(`\x1b[32m✔ [Observation]\x1b[0m ${text.slice(0, 300)}${text.length > 300 ? '...' : ''}\n`)
+      }
     })
 
-    ctx.on('agent/chunk', (a: any, chunk: any) => {
-      process.stdout.write(chunk)
+    ctx.on('agent/error', (a: any, err: any) => {
+      console.error('\x1b[31m[Agent Error]\x1b[0m', err)
     })
 
-    ctx.on('agent/tool-call', (a: any, call: any) => {
-      console.log(`\n\x1b[36m⚡ [Tool Call] ${call.name}\x1b[0m: ${JSON.stringify(call.arguments)}`)
-    })
+    agent.followup({
+      id: crypto.randomUUID() as any,
+      role: 'user',
+      content: [{ type: 'text', text: task }],
+      source: { kind: 'user' },
+    } as any)
 
-    ctx.on('agent/tool-result', (a: any, call: any, res: any) => {
-      console.log(`\x1b[32m✔ [Observation]\x1b[0m ${res.content.slice(0, 300)}${res.content.length > 300 ? '...' : ''}\n`)
-    })
-
-    await agent.followup(task)
+    await agent.whenIdle()
     console.log('\n\x1b[32m============================================================\x1b[0m')
     console.log('✨ Task completed.')
     process.exit(0)
@@ -440,6 +459,10 @@ async function main() {
 
     const handle = await ctx.agents.create({
       sessionId: `repl-${Date.now()}` as any,
+      agentOptions: {
+        provider: 'deepseek-official',
+        model: model || 'deepseek-chat',
+      },
       meta: {
         cwd: process.cwd(),
         agentPreset: preset,
@@ -447,20 +470,23 @@ async function main() {
     })
     let agent = handle.agent
 
-    ctx.on('agent/thinking', (a: any, thinking: any) => {
-      process.stdout.write(`\x1b[90m${thinking}\x1b[0m`)
-    })
-
-    ctx.on('agent/chunk', (a: any, chunk: any) => {
-      process.stdout.write(chunk)
-    })
-
-    ctx.on('agent/tool-call', (a: any, call: any) => {
-      console.log(`\n\x1b[36m⚡ [Tool Call] ${call.name}\x1b[0m: ${JSON.stringify(call.arguments)}`)
-    })
-
-    ctx.on('agent/tool-result', (a: any, call: any, res: any) => {
-      console.log(`\x1b[32m✔ [Observation]\x1b[0m ${res.content.slice(0, 300)}${res.content.length > 300 ? '...' : ''}\n`)
+    ctx.on('session/event', (_session: any, event: any) => {
+      if (event.type === 'assistant/chunk') {
+        const chunk = event.data?.chunk
+        if (chunk?.type === 'reasoning-delta' && chunk.text) {
+          process.stdout.write(`\x1b[90m${chunk.text}\x1b[0m`)
+        } else if (chunk?.type === 'text-delta' && chunk.text) {
+          process.stdout.write(chunk.text)
+        }
+      } else if (event.type === 'tool/call') {
+        const name = event.data?.name || event.data?.call?.name || 'tool'
+        const args = event.data?.arguments || event.data?.call?.arguments || {}
+        console.log(`\n\x1b[36m⚡ [Tool Call] ${name}\x1b[0m: ${JSON.stringify(args)}`)
+      } else if (event.type === 'tool/result') {
+        const content = event.data?.content || event.data?.result?.content || JSON.stringify(event.data)
+        const text = typeof content === 'string' ? content : JSON.stringify(content)
+        console.log(`\x1b[32m✔ [Observation]\x1b[0m ${text.slice(0, 300)}${text.length > 300 ? '...' : ''}\n`)
+      }
     })
 
     const rl = readline.createInterface({
@@ -512,12 +538,18 @@ async function main() {
               preset = nextPreset
               console.log(`\x1b[32m✔ Switched active preset to: ${preset}\x1b[0m`)
               rl.setPrompt(`\x1b[35m(pi-dsh:${preset})>\x1b[0m `)
-              agent = await ctx.agents.create({
-                id: `repl-agent-${Date.now()}`,
-                preset,
-                model,
-                cwd: process.cwd()
+              const nextHandle = await ctx.agents.create({
+                sessionId: `repl-agent-${Date.now()}` as any,
+                agentOptions: {
+                  provider: 'deepseek-official',
+                  model: model || 'deepseek-chat',
+                },
+                meta: {
+                  cwd: process.cwd(),
+                  agentPreset: preset,
+                },
               })
+              agent = nextHandle.agent
             }
             break
           }
@@ -546,7 +578,13 @@ async function main() {
         return
       }
 
-      await agent.followup(input)
+      agent.followup({
+        id: crypto.randomUUID() as any,
+        role: 'user',
+        content: [{ type: 'text', text: input }],
+        source: { kind: 'user' },
+      } as any)
+      await agent.whenIdle()
       console.log('\n')
       rl.prompt()
     })
