@@ -290,6 +290,24 @@ async function main() {
 
     try {
       ctx.webServer.register({
+        kind: 'exact',
+        path: '/api/pluginGraph',
+        handler: async (_req, res) => {
+          try {
+            const { buildPluginGraph } = await import('./graph.ts')
+            const graphData = buildPluginGraph(ctx, profileFile, dshPackageMap)
+            res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' })
+            res.end(JSON.stringify({ ok: true, value: graphData }))
+          } catch (err: any) {
+            res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' })
+            res.end(JSON.stringify({ ok: false, error: err?.message || String(err) }))
+          }
+        },
+      })
+    } catch {}
+
+    try {
+      ctx.webServer.register({
         kind: 'prefix',
         path: '/plugins',
         handler: async (req, res) => {
