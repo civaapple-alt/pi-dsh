@@ -63,17 +63,30 @@ DEEPSEEK_MODEL=deepseek-chat
 #### 🌟 方式 A：启动现代 Web GUI 工作台 (推荐)
 ```bash
 pnpm start
-# 浏览器访问 http://localhost:3000
+# 浏览器访问 http://localhost:3000，享受完整的多会话流、文件高亮与依赖拓扑
 ```
 
-#### ⚡ 方式 B：执行单任务 Headless 自动化 (CLI 批处理)
+#### ⚡ 方式 B：执行单任务 Headless 自动化 (CLI 批处理与 CI/CD)
+无需启动 Web 浏览器，直接在终端作为非交互式命令行工具执行单一任务，任务完成后自动退出并返回退出码：
+
 ```bash
+# 1. 默认 Standard 标准全能模式执行编码任务
 pnpm headless "检查当前仓库的 Git 状态并列出修改的文件"
+
+# 2. 切换 Reviewer 安全审查预设（纯只读模式，禁止写操作）
+pnpm headless --preset reviewer "审查 presets/ 目录下的配置安全性"
+
+# 3. 切换 Minimal 极简终端运维预设（Token 开销极低）
+pnpm headless --preset minimal "检查当前机器的 node, pnpm 和 git 版本"
+
+# 4. 切换 Coder 深度开发预设并指定 DeepSeek 推理模型
+pnpm headless --preset coder --model deepseek-reasoner "分析并发 RPC 时序竞态问题"
 ```
 
-#### 💻 方式 C：启动终端交互式 REPL
+#### 💻 方式 C：启动终端交互式 REPL (支持 Pi 原生 Slash Commands)
 ```bash
-pnpm pi --profile headless --preset standard
+pnpm pi --preset standard
+# 支持在终端输入 /help, /preset, /model, /compact, /clear 等 Slash 快捷指令
 ```
 
 ---

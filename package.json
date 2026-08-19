@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -r --filter=\"./packages/**\" run build",
-    "start": "tsx apps/cli/src/index.ts --profile web --preset coder",
-    "dev": "tsx apps/cli/src/index.ts --profile web --preset coder",
-    "headless": "tsx apps/cli/src/index.ts --profile headless --preset coder",
-    "pi": "tsx apps/cli/src/index.ts"
+    "start": "tsx apps/cli/src/index.ts --profile web --preset standard",
+    "dev": "tsx apps/cli/src/index.ts --profile web --preset standard",
+    "headless": "tsx apps/cli/src/index.ts --profile headless --preset standard",
+    "pi": "tsx apps/cli/src/index.ts --preset standard"
   },
   "dependencies": {
     "@deepseek-ai/cordis": "^4.0.1",

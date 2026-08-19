@@ -96,7 +96,7 @@ function buildDshPackageMap() {
 function parseArgs() {
   const args = process.argv.slice(2)
   let profile = 'web'
-  let preset = 'coder'
+  let preset = 'standard'
   let model = process.env.DEEPSEEK_MODEL || 'deepseek-chat'
   const taskParts: string[] = []
 
@@ -114,14 +114,15 @@ Usage: pi-dsh [options] [task...]
 
 Options:
   --profile <name>   Profile name to load (web | headless) [default: web]
-  --preset <name>    Agent capability preset (coder | reviewer | minimal) [default: coder]
+  --preset <name>    Agent capability preset (standard | reviewer | minimal | coder) [default: standard]
   --model <name>     LLM model name [default: deepseek-chat]
   --help, -h         Show help
 
 Examples:
-  pnpm start                                       # Launch Web GUI
-  pnpm headless "List all files in this project"   # Run one-shot headless task
-  pnpm pi --profile headless --preset coder        # Launch interactive CLI REPL
+  pnpm start                                                # Launch Web GUI
+  pnpm headless "List all files in this project"            # Run one-shot headless task
+  pnpm headless --preset reviewer "Audit presets safety"    # Run headless with reviewer preset
+  pnpm pi --preset standard                                 # Launch interactive CLI REPL
 `)
       process.exit(0)
     } else {

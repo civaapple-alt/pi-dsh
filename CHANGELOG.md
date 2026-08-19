@@ -6,6 +6,30 @@
 
 ---
 
+## [0.4.1] - 2026-08-19
+
+### 🚀 自动化无头执行与跨平台终端驱动全面打通 (Headless Profile & Shell Seam Parity)
+
+- **Headless Profile 与单任务 CLI 自动化 (`pnpm headless`)**：
+  - **基础设施补齐**：在 `profiles/headless.yml` 中完整装配 `system-prompt`、`session`、`llm`、`credentials`、`fs-local`、`subprocess`、`shell`、`storage` 等底层基础设施插件，彻底解决此前无头模式因缺少上下文服务抛出的 `no agent factory registered` 异常。
+  - **智能体工厂参数对齐**：在 `apps/cli/src/index.ts` 中规范化 `ctx.agents.create` 调用参数，显式传递合法的 `sessionId` 与 `meta: { cwd, agentPreset }`，打通无头自动化单任务直调（`pnpm headless --preset standard "<task>"`）。
+  - **默认预设全面对齐 `standard`**：将 `package.json` 中的 `start`、`dev`、`headless`、`pi` 默认预设统一对齐为推荐的 `standard`（标准全能编码模式）。
+
+- **跨平台 Shell 驱动动态映射与双工具注入 (`ctx.shell.resolve` 彻底解决)**：
+  - **抽象 Seam 自动映射**：在 CLI 启动器中自动将抽象契约 `@deepseek-ai/dsh-shell` 映射为对应操作系统底层驱动（Windows 平台自动注入 `@deepseek-ai/dsh-pwsh-local`，Linux/macOS 平台自动注入 `@deepseek-ai/dsh-bash-local`），杜绝因加载抽象类型导致 `ctx.shell.resolve is not a function` 报错。
+  - **多平台工具双向赋能**：在 `presets/standard`、`presets/coder`、`presets/minimal` 预设中同时注入 `@deepseek-ai/dsh-tool-pwsh` 与 `@deepseek-ai/dsh-tool-bash`。在 Windows 下由 `tool-pwsh` 提供专属 PowerShell 提示词引导，杜绝 Linux 风格参数（如 `ls -la`）报错，大幅缩短模型自愈轮次。
+
+- **Windows 根目录文件系统容错 (`System Volume Information` 权限保护)**：
+  - 在 `packages/fs/fs-local/src/fsio.ts` 的 `listDirectory` 逻辑中加入受保护系统目录异常捕获，遇到 Windows 根驱动器上的隐藏目录（如 `System Volume Information`、`$RECYCLE.BIN`）时优雅标记为 `type: 'other'`，避免抛出致命 `EPERM / permission denied` 中断整目录浏览。
+
+- **用户消息评价 Sidecar 存储与路由修复 (`messageFeedback` 404 彻底解决)**：
+  - 规范化 `profiles/web.yml` 中的插件加载顺序，显式配置 `maxNoteBytes: 8192`，打通 `/api/messageFeedback/list`、`put`、`delete` 的 Typert RPC 路由与 Sidecar 存储。
+
+- **开源绝对路径净化 (Zero Hardcoded User Paths)**：
+  - 全局清理 `D:\gh-ws\...` 与本地盘符硬编码，全面转换为基于 `process.cwd()` 的跨平台相对路径自适应解析。
+
+---
+
 ## [0.4.0] - 2026-08-19
 
 ### 🌐 核心特性：Cordis 插件与能力接缝可视化依赖图 (Interactive Capability Seam Dependency Graph)
