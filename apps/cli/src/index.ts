@@ -179,8 +179,13 @@ async function main() {
   // 3. Apply Plugins declared in Profile
   for (const entry of pluginEntries) {
     if (entry.disabled) continue
-    const target = entry.name || entry.path
+    let target = entry.name || entry.path
     if (!target) continue
+
+    // Map abstract dsh-shell seam to concrete local provider
+    if (target === '@deepseek-ai/dsh-shell') {
+      target = process.platform === 'win32' ? '@deepseek-ai/dsh-pwsh-local' : '@deepseek-ai/dsh-bash-local'
+    }
 
     try {
       let mod: any
@@ -385,12 +390,14 @@ async function main() {
   } else if (task) {
     // One-shot headless execution
     console.log(`\n\x1b[33m[Task]\x1b[0m ${task}\n`)
-    const agent = await ctx.agents.create({
-      id: 'cli-agent',
-      preset,
-      model,
-      cwd: process.cwd()
+    const handle = await ctx.agents.create({
+      sessionId: `cli-${Date.now()}` as any,
+      meta: {
+        cwd: process.cwd(),
+        agentPreset: preset,
+      },
     })
+    const agent = handle.agent
 
     ctx.on('agent/thinking', (a, thinking) => {
       process.stdout.write(`\x1b[90m${thinking}\x1b[0m`)
@@ -417,12 +424,14 @@ async function main() {
     console.log(`\x1b[32mInteractive REPL Mode (Pi 80% Feature Suite).\x1b[0m`)
     console.log(`Type instructions or Slash Commands: \x1b[33m/help, /preset, /model, /clear, /compact, /exit\x1b[0m\n`)
 
-    let agent = await ctx.agents.create({
-      id: 'repl-agent',
-      preset,
-      model,
-      cwd: process.cwd()
+    const handle = await ctx.agents.create({
+      sessionId: `repl-${Date.now()}` as any,
+      meta: {
+        cwd: process.cwd(),
+        agentPreset: preset,
+      },
     })
+    let agent = handle.agent
 
     ctx.on('agent/thinking', (a, thinking) => {
       process.stdout.write(`\x1b[90m${thinking}\x1b[0m`)
