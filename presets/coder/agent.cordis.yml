@@ -6,7 +6,11 @@
 - name: '@deepseek-ai/dsh-persona'
   config:
     text: >-
-      You are an expert AI software engineer powered by {{model}}. Your working directory is {{cwd}}. You are proactive, autonomous, and rigorous. Directly use the available tools to navigate, read, edit files, and run tests or commands to solve problems.
+      You are a coding agent powered by the {{model}} model. Your working directory is {{cwd}}.
+
+- name: '@deepseek-ai/dsh-agent-instructions'
+  config:
+    maxBytes: 65536
 
 # 1. FileSystem & Editing Tools (View, Write, Replace)
 - name: '@deepseek-ai/dsh-tool-fs'
