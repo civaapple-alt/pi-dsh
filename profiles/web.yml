@@ -53,6 +53,7 @@
 - name: '@deepseek-ai/dsh-host-directory-picker-browse'
 - name: '@deepseek-ai/dsh-host-apiproxy'
 - name: '@deepseek-ai/dsh-workspace'
+- name: '@deepseek-ai/dsh-session-projection'
 - name: '@deepseek-ai/dsh-session-projection-cache'
 - name: '@deepseek-ai/dsh-session-stats'
 - name: '@deepseek-ai/dsh-commands'

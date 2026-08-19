@@ -22,6 +22,7 @@
 - name: '@deepseek-ai/dsh-subagent'
 - name: '@deepseek-ai/dsh-attachment-local'
 - name: '@deepseek-ai/dsh-user-questions'
+- name: '@deepseek-ai/dsh-session-projection'
 
 # ── 2. 持久化存储与会话面 ────────────────────────────────────────────
 - name: '@deepseek-ai/dsh-storage'
