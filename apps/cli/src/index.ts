@@ -461,11 +461,15 @@ async function main() {
     console.log(`\x1b[32mInteractive REPL Mode (Pi 80% Feature Suite).\x1b[0m`)
     console.log(`Type instructions or Slash Commands: \x1b[33m/help, /preset, /model, /clear, /compact, /exit\x1b[0m\n`)
 
+    const defaultSelection = (ctx as any).agentDefaultModel?.currentSelection?.()
+    let activeProvider = defaultSelection?.provider || 'deepseek-official'
+    let activeModel = model || defaultSelection?.model || 'deepseek-chat'
+
     const handle = await ctx.agents.create({
       sessionId: `repl-${Date.now()}` as any,
       agentOptions: {
-        provider: 'deepseek-official',
-        model: model || 'deepseek-chat',
+        provider: activeProvider,
+        model: activeModel,
       },
       setup: (agentCtx: Context) => ctx.agentPresets.mount(agentCtx, preset).then(() => undefined),
       meta: {
@@ -522,8 +526,8 @@ async function main() {
           case 'help':
             console.log(`
 \x1b[1mPi-DSH Slash Commands:\x1b[0m
-  /preset <name>   Switch active preset (coder, reviewer, minimal)
-  /model <name>    Switch LLM model (e.g. deepseek-chat, deepseek-reasoner)
+  /preset [name]   Show or switch active capability preset (standard | coder | reviewer | minimal)
+  /model [name]    Show or switch LLM model (e.g. deepseek-chat, deepseek-reasoner, deepseek-v4-flash)
   /clear           Clear console screen
   /compact         Trigger conversation compaction & token metering
   /help            Show this help manual
@@ -538,7 +542,14 @@ async function main() {
           case 'preset': {
             const nextPreset = args[0]
             if (!nextPreset) {
-              console.log(`Current preset: ${preset}. Available: coder, reviewer, minimal`)
+              let presetNames: string[] = []
+              try {
+                const list = await (ctx as any).agentPresets?.list?.()
+                if (list) presetNames = list.map((p: any) => p.id)
+              } catch {}
+              console.log(`\x1b[1mCurrent Preset:\x1b[0m \x1b[35m${preset}\x1b[0m`)
+              console.log(`\x1b[1mAvailable Presets:\x1b[0m ${presetNames.join(', ') || 'standard, coder, reviewer, minimal'}`)
+              console.log(`\x1b[90mUsage: /preset <name> to switch\x1b[0m`)
             } else {
               preset = nextPreset
               console.log(`\x1b[32m✔ Switched active preset to: ${preset}\x1b[0m`)
@@ -546,8 +557,8 @@ async function main() {
               const nextHandle = await ctx.agents.create({
                 sessionId: `repl-agent-${Date.now()}` as any,
                 agentOptions: {
-                  provider: 'deepseek-official',
-                  model: model || 'deepseek-chat',
+                  provider: activeProvider,
+                  model: activeModel,
                 },
                 setup: (agentCtx: Context) => ctx.agentPresets.mount(agentCtx, preset).then(() => undefined),
                 meta: {
@@ -563,10 +574,35 @@ async function main() {
           case 'model': {
             const nextModel = args[0]
             if (!nextModel) {
-              console.log(`Current model: ${model}`)
+              let availableModels: string[] = []
+              try {
+                const models = await (ctx as any).llm?.listModels?.(activeProvider)
+                if (models) availableModels = models.map((m: any) => m.id)
+              } catch {}
+              console.log(`\x1b[1mActive Provider:\x1b[0m ${activeProvider}`)
+              console.log(`\x1b[1mCurrent Model:\x1b[0m \x1b[32m${activeModel}\x1b[0m`)
+              if (availableModels.length > 0) {
+                console.log(`\x1b[1mAvailable Models:\x1b[0m ${availableModels.join(', ')}`)
+              } else {
+                console.log(`\x1b[1mAvailable Models:\x1b[0m deepseek-chat, deepseek-reasoner, deepseek-v4-flash, deepseek-v4-pro`)
+              }
+              console.log(`\x1b[90mUsage: /model <name> to switch\x1b[0m`)
             } else {
-              model = nextModel
-              console.log(`\x1b[32m✔ Switched model to: ${model}\x1b[0m`)
+              activeModel = nextModel
+              const nextHandle = await ctx.agents.create({
+                sessionId: `repl-agent-${Date.now()}` as any,
+                agentOptions: {
+                  provider: activeProvider,
+                  model: activeModel,
+                },
+                setup: (agentCtx: Context) => ctx.agentPresets.mount(agentCtx, preset).then(() => undefined),
+                meta: {
+                  cwd: process.cwd(),
+                  agentPreset: preset,
+                },
+              })
+              agent = nextHandle.agent
+              console.log(`\x1b[32m✔ Switched model to: ${activeModel}\x1b[0m`)
             }
             break
           }
