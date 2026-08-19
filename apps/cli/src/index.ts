@@ -195,7 +195,7 @@ async function main() {
         mod = await import(target)
       }
       const plugin = mod.default || mod
-      const config = entry.config ? { ...entry.config } : undefined
+      let config = entry.config ? { ...entry.config } : undefined
 
       // Auto-resolve relative or omitted distIndex for frontend-static
       if (target.includes('frontend-static')) {
@@ -225,6 +225,11 @@ async function main() {
           ...r,
           path: r.path ? (path.isAbsolute(r.path) ? r.path : path.resolve(process.cwd(), r.path)) : path.resolve(process.cwd(), 'presets'),
         }))
+      }
+
+      // Default maxNoteBytes for message-feedback
+      if (target.includes('message-feedback')) {
+        config = { maxNoteBytes: 8192, ...config }
       }
 
       const fiber = await ctx.plugin(plugin, config)

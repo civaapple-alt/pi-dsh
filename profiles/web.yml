@@ -36,6 +36,9 @@
 - name: '@deepseek-ai/dsh-storage-domain'
   config:
     backend: 'json'
+- name: '@deepseek-ai/dsh-session-persistence-jsonl'
+  config:
+    root: '.sessions'
 
 # ── 3. Web 宿主服务、存储与 API 传输网关 ───────────────────────────────────────
 - name: '@deepseek-ai/dsh-host-webserver'
@@ -54,6 +57,8 @@
 - name: '@deepseek-ai/dsh-session-stats'
 - name: '@deepseek-ai/dsh-commands'
 - name: '@deepseek-ai/dsh-message-feedback'
+  config:
+    maxNoteBytes: 8192
 - name: '@deepseek-ai/dsh-cordis-host-runner'
 - name: '@deepseek-ai/dsh-host-plugin-inventory'
 
@@ -123,10 +128,6 @@
 - name: '@deepseek-ai/dsh-agent-loop'
   config:
     defaultModel: deepseek-chat
-
-- name: '@deepseek-ai/dsh-session-persistence-jsonl'
-  config:
-    root: '.sessions'
 
 - name: '@deepseek-ai/dsh-compaction-basic'
   config:
