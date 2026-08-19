@@ -8,7 +8,9 @@
 
 # 2. Terminal & Process Tools
 - name: '@deepseek-ai/dsh-tool-bash'
+  disabled: !!js process.platform === 'win32'
 - name: '@deepseek-ai/dsh-tool-pwsh'
+  disabled: !!js process.platform !== 'win32'
 
 # 3. Code Search & Navigation Tools
 - name: '@deepseek-ai/dsh-tool-fs-search'
